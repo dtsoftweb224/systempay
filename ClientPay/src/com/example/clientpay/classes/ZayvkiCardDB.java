@@ -20,10 +20,10 @@ public class ZayvkiCardDB {
 			+ " summaCard = :sCard, summaPay = :sPay, payIn = :type,"
 			+ " valuta = :val, wmid = :wmid WHERE id = :id";
 
-	private final String SQL_ZAYVKI_WRITE = "INSERT INTO zayvkiCard(payOut, date"
+	private final String SQL_ZAYVKI_WRITE = "INSERT INTO zayvkiCard(payOut, date,"
 			+ "fioClient, kommis, numberPay, status, summaCard, summaPay, payIn,"
-			+ "valuta, wmid) VALUES(:out, :data, :fio, :kom, :num, :status,"
-			+ ":sumC, :sumP, :in, :val, :wmid)";
+			+ "valuta, wmid, mail) VALUES(:out, :data, :fio, :kom, :num, :status,"
+			+ ":sumC, :sumP, :in, :val, :wmid, :mail)";
 	
 	public ZayvkiCardDB(Connection conn) {
 		this.conn = conn;
@@ -76,7 +76,7 @@ public class ZayvkiCardDB {
     	        .addParameter("sPay", zayvka.getSummaPay())
     	        .addParameter("payIn", zayvka.getPayIn())
     	        .addParameter("val", zayvka.getValuta())
-    	        .addParameter("wmid", zayvka.getWmid())
+    	        .addParameter("wmid", zayvka.getWmid())    	      
     	        .executeUpdate();
     	} catch (Exception e) {
     		e.printStackTrace();
@@ -112,7 +112,27 @@ public class ZayvkiCardDB {
     	}
     }
     
+    /* Добавление новой заявки в базу данных */
     public void WriteZayvka(ZayvkaCard zayvka) {
     	
+    	try {
+    	    this.conn.createQuery(SQL_ZAYVKI_WRITE)   
+    	        .addParameter("out", zayvka.getPayOut())
+    	        .addParameter("data", zayvka.getDate())
+    	        .addParameter("fio", zayvka.getFioClient())
+    	        .addParameter("kom", zayvka.getKommis())
+    	        .addParameter("num", zayvka.getNumberPay())
+    	        .addParameter("status", zayvka.getStatus())
+    	        .addParameter("sumC", zayvka.getSummaCard())
+    	        .addParameter("sumP", zayvka.getSummaPay())
+    	        .addParameter("in", zayvka.getPayIn())
+    	        .addParameter("val", zayvka.getValuta())
+    	        .addParameter("wmid", zayvka.getWmid())
+    	        .addParameter("mail", zayvka.getMail())
+    	        .executeUpdate();
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
     }
+	
 }

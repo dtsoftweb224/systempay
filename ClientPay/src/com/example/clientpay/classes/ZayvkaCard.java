@@ -15,13 +15,15 @@ public class ZayvkaCard {
 		
 		id = 0;
 		wmid = "";
-		date = null;
+		date = new Date();
 		status = "";
 		fioClient = "";		
 		valuta = "";
 		mail = "";
 		payOut = "";
 		payIn = "";
+		summaPay = 0.0;
+		summaCard = 0.0;
 	}
 	/**
 	 * Идентификатор клиента
