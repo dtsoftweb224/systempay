@@ -7,7 +7,7 @@ public class DB {
 
 	private static final String DB_URL = "jdbc:mysql://localhost:3306/pay_system";
 	private static final String DB_USER = "root";
-	private static final String DB_PASS = "1";
+	private static final String DB_PASS = "root";
 	
 	
 	public static Connection getConnection() {
