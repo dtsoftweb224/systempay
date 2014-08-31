@@ -192,6 +192,7 @@ public class ManagerpayUI extends UI {
 			zayvkiCardTable.setColumnHeader(tableFields[i], tableFieldsTitle[i]);
     	}	
 		
+		/* Обработка клика по строке таблицы */
 		zayvkiCardTable.addItemClickListener(new ItemClickListener() {
 			
 			@Override

@@ -8,6 +8,7 @@ import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.FormLayout;
@@ -21,6 +22,8 @@ public class WindowZayvkiCard extends Window
 	 */
 	private static final long serialVersionUID = 1L;
 	private FormLayout mainForm = null;
+	private GridLayout gridLayout = null;
+	
 	BeanFieldGroup<ZayvkaCard> binder = new BeanFieldGroup<ZayvkaCard>(ZayvkaCard.class);
 	
 	private String[] formFields = new String[] {"id", "wmid", "date", "payOut",
@@ -64,8 +67,14 @@ public class WindowZayvkiCard extends Window
 	@SuppressWarnings("serial")
 	private void buildButtonForm() {
 		
+		gridLayout = new GridLayout(2, 1);
+		gridLayout.setWidth("100%");
+		
 		Button ok = new Button("Сохранение");
 		Button cancel = new Button("Отмена");
+		
+		gridLayout.addComponent(cancel, 0, 0);
+		gridLayout.addComponent(ok, 1, 0);
         
 		ok.addClickListener(new ClickListener() {
       
@@ -100,8 +109,8 @@ public class WindowZayvkiCard extends Window
 			}
 		});
 		
-        mainForm.addComponent(ok);
-        mainForm.addComponent(cancel);
+        //mainForm.addComponent(ok);
+        mainForm.addComponent(gridLayout);
 	}
 
 	@Override

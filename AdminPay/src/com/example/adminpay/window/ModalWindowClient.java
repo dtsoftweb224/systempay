@@ -6,6 +6,7 @@ import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -18,6 +19,7 @@ public class ModalWindowClient extends Window {
 	private static final long serialVersionUID = 1L;
 
 	private FormLayout mainForm = null;
+	private GridLayout gridLayout = null;
 	
 	private BeanFieldGroup<Client> binder = new BeanFieldGroup<Client>(Client.class);
 	
@@ -68,8 +70,14 @@ public class ModalWindowClient extends Window {
 	@SuppressWarnings("serial")
 	private void buildButtonForm() {
 		
-		Button ok = new Button("Сохранение");
+		gridLayout = new GridLayout(2, 1);
+		gridLayout.setWidth("100%");	
+		
+		Button ok = new Button("Сохраненить");
 		Button cancel = new Button("Отмена");
+		
+		gridLayout.addComponent(cancel, 0, 0);
+		gridLayout.addComponent(ok, 1, 0);
         
 		ok.addClickListener(new ClickListener() {
       
@@ -104,8 +112,8 @@ public class ModalWindowClient extends Window {
 			}
 		});
 		
-        mainForm.addComponent(ok);
-        mainForm.addComponent(cancel);
+        //mainForm.addComponent(ok);
+        mainForm.addComponent(gridLayout);
 	}
 
 }
