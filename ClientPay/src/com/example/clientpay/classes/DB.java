@@ -5,7 +5,7 @@ import org.sql2o.Sql2o;
 
 public class DB {
 	
-	private static final String DB_URL = "jdbc:mysql://localhost:3306/pay_system";
+	private static final String DB_URL = "jdbc:mysql://localhost:3306/pay_system?characterEncoding=UTF-8&amp;characterSetResults=utf8&amp";
 	private static final String DB_USER = "root";
 	private static final String DB_PASS = "root";
 	

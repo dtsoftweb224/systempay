@@ -1,4 +1,4 @@
-package com.example.payclient.support;
+package com.example.clientpay.classes;
 
 /**
  * @author Makarov Roman

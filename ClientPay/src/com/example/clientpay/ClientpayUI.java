@@ -3,8 +3,11 @@ package com.example.clientpay;
 import java.util.Date;
 
 import com.example.clientpay.classes.DB;
+import com.example.clientpay.classes.RegZayvki;
+import com.example.clientpay.classes.RegZayvkiDB;
 import com.example.clientpay.classes.ZayvkaCard;
 import com.example.clientpay.classes.ZayvkiCardDB;
+import com.example.clientpay.support.DbDop;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItem;
@@ -36,16 +39,18 @@ public class ClientpayUI extends UI {
 	private Button OK;
 	private Button cancel;
 	private ComboBox type;
-	private TextField serial;
-	private TextField number;
+	private TextField serial;  // Серия паспорта 
+	private TextField number;  // Номер паспорта
+	private TextField address; // Адрес регистрации
+	private ComboBox paySystem; 
 	private VerticalLayout identLayout;
 	
 	private String[] formFields = new String[] {"wmid", "date", "payOut",
-			"fioClient", "payIn", "valuta", "summaPay", "kommis", "summaCard", 
+			"fioClient", "valuta", "summaPay", "kommis", "summaCard", 
 			"mail"};
 	/* Названия полей для отображения*/
 	private String[] formFieldsTitle = new String[] {"Кошелек", "Дата", "Банк",
-			"ФИО клиента", "Платежная система", "Валюта", "Сумма списания", 
+			"ФИО клиента", "Валюта", "Сумма списания", 
 			"Комиссия", "Сумма зачисления", "Эл. почта"};
 
 	@Override
@@ -57,13 +62,19 @@ public class ClientpayUI extends UI {
 		layout.addComponent(mainForm);
 	}
 	
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings({ "deprecation", "unchecked" })
 	private void buildMainForm() {
 	    	
 	  	mainForm = new Form();
 	    mainForm.setVisible(true);	
 	    	
 	    buildTypeBox();
+	    paySystem = new ComboBox("Платежная система");
+	    paySystem.addItem("WebMoney");
+	    paySystem.addItem("Яндекс");
+	    paySystem.setWidth("220px");
+	    paySystem.setValue("WebMoney");
+	    mainForm.getLayout().addComponent(paySystem);
 	    	
 	    beans = new BeanItem<ZayvkaCard>(zayvkiCard);
 		mainForm.setItemDataSource(beans); 
@@ -75,8 +86,13 @@ public class ClientpayUI extends UI {
 			 mainForm.getField(formFields[i]).setCaption(formFieldsTitle[i]);
 			 /* Установка ширины поля */
 			 mainForm.getField(formFields[i]).setWidth("220px");
-		 }			
-		 // 
+		 }
+		 // Временное заполнение полей формы
+		 mainForm.getField("mail").setValue("prizrak309@mail.ru");
+		 mainForm.getField("payOut").setValue("Сбербанк");
+		 mainForm.getField("fioClient").setValue("Иванов Иван Иванович");
+		 mainForm.getField("valuta").setValue("USD");
+		 //		 
 		 buildIdentField();
 		 buildButtonForm();
     }	
@@ -97,11 +113,13 @@ public class ClientpayUI extends UI {
 				if (type.getValue().equals("Наличный")) {
 					serial.setVisible(true);
 					number.setVisible(true);
+					address.setVisible(true);
 				}
 				
 				if (type.getValue().equals("Безналичный")) {
 					serial.setVisible(false);
 					number.setVisible(false);
+					address.setVisible(false);
 				}
 			}
 		});
@@ -125,6 +143,12 @@ public class ClientpayUI extends UI {
 	   	number.setWidth("220px");
 	   	number.setVisible(false);    	
 	   	mainForm.getLayout().addComponent(number);
+	   	
+	   	address = new TextField("Адрес регистрации");
+	   	address.setImmediate(true);
+	   	address.setWidth("220px");
+	   	address.setVisible(false);
+	   	mainForm.getLayout().addComponent(address);
 	    	
     }
    
@@ -147,12 +171,18 @@ public class ClientpayUI extends UI {
 				BeanItem<ZayvkaCard> item = (BeanItem<ZayvkaCard>) mainForm.getItemDataSource();
 				zayvkiCard = item.getBean();
 				zayvkiCard.setStatus("Принято");
+				zayvkiCard.setPayIn(paySystem.getValue().toString());
 				ZayvkiCardDB zayvkiCardDB = new ZayvkiCardDB(DB.getConnection());
 				// Запись с БД
 				zayvkiCardDB.WriteZayvka(zayvkiCard);
+				DbDop.WriteRegZayvka(zayvkiCard);
 				// Сообщение о выполнении операции
 				MessageBox.showPlain(Icon.INFO, "Фомрирование заявки", 
 						"Формирование заявки выполнено!", ButtonId.OK);
+				// Информация о зарегистрированной заявке
+				/*RegZayvki regZayvka = new RegZayvki(zayvkiCard);
+				RegZayvkiDB regDb = new RegZayvkiDB(DB.getConnection());
+				regDb.WriteRegZayvka(regZayvka);*/
 				// Очистка данных
 				clearFieldsForm();				
 			} catch (Exception e) {					
@@ -175,15 +205,19 @@ public class ClientpayUI extends UI {
 @SuppressWarnings({ "unchecked", "deprecation" })
 private void clearFieldsForm() {
 
- 	 mainForm.getField("bank").setValue("");
+ 	 mainForm.getField("payOut").setValue("");
  	 mainForm.getField("fioClient").setValue("");
- 	 mainForm.getField("typePal").setValue("");
+ 	 mainForm.getField("payIn").setValue("");
  	 mainForm.getField("valuta").setValue("");
  	 mainForm.getField("wmid").setValue("");
- 	 mainForm.getField("summaPay").setValue(0.0);
- 	 mainForm.getField("kommis").setValue(0.0);
- 	 mainForm.getField("summaCard").setValue(0.0);
+ 	 mainForm.getField("summaPay").setValue("");
+ 	 mainForm.getField("kommis").setValue("");
+ 	 mainForm.getField("summaCard").setValue("");
  	 mainForm.getField("date").setValue(new Date());
+ 	 //Поля для наличного расчета
+ 	 serial.setValue("");
+ 	 number.setValue("");
+ 	 address.setValue("");
   }
 
 }
