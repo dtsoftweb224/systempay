@@ -1,5 +1,5 @@
 CREATE TABLE regsms (
-  id_sms int(11) NOT NULL AUTO_INCREMENT,
+  id_sms int(11) NOT NULL,
   data date NOT NULL,
   telephone varchar(11) NOT NULL,
   status varchar(100) NOT NULL,

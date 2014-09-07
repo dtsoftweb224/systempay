@@ -85,6 +85,7 @@ public class ClientpayUI extends UI {
 	    	
 	    buildTypeBox();
 	    buildBankiBox();
+	    
 	    paySystem = new ComboBox("Платежная система");
 	    paySystem.addItem("WebMoney");
 	    paySystem.addItem("Яндекс");
@@ -105,7 +106,7 @@ public class ClientpayUI extends UI {
 			 mainForm.getField(formFields1[i]).setWidth("220px");
 		 }
 		 // Временное заполнение полей формы
-		 mainForm.getField("mail").setValue("prizrak309@mail.ru");
+		 //mainForm.getField("mail").setValue("prizrak309@mail.ru");
 		 //mainForm.getField("payOut").setValue("Сбербанк");
 		 mainForm.getField("payIn").setValue("WebMoney");
 		 mainForm.getField("fName").setValue("Иван");	
@@ -207,8 +208,11 @@ public class ClientpayUI extends UI {
 						"Формирование заявки выполнено!", ButtonId.OK);
 				// Информация о зарегистрированной заявке
 				// Отправка SMS
-				/*SendSMS sms = new SendSMS();
-				sms.sendRegZayvka("79041698744", numPay);*/
+				if (zayvkiCard.getTelephone() != null && 
+						zayvkiCard.getTelephone().length() > 1) {
+					SendSMS sms = new SendSMS();
+					sms.sendRegZayvka(zayvkiCard.getTelephone(), numPay);
+				}
 				// Отправка уведомления на e-mail
 				SendMail sendMail = new SendMail(zayvkiCard.getMail(), numPay);
 				// Очистка данных
@@ -259,6 +263,8 @@ public class ClientpayUI extends UI {
 	} catch (Exception e) {
 		e.printStackTrace();
 	}
+	 
+	 banki.addItem("ВТБ");
 	 
 	 mainForm.getLayout().addComponent(banki);
  }

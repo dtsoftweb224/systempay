@@ -1,4 +1,4 @@
-package com.example.clientpay.support;
+package com.example.adminpay.support;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,44 +41,6 @@ public class SendSMS {
 	}
 	
 	/**
-	 * Отправка сообщения о регистрации заявки
-	 * @param tele      - телефон клиента
-	 * @param zayvkaNum - номер оформленной зявки
-	 * @throws IOException 
-	 * @throws UnsupportedEncodingException 
-	 */
-	public void sendRegZayvka(String tele, String zayvkaNum) throws UnsupportedEncodingException, IOException {
-		
-		// устанавливаем соединение
-		URLConnection conn = new URL("https://gate.smsaero.ru/send/?").openConnection();
-		// мы будем писать POST данные в out stream
-		conn.setDoOutput(true);
-
-		// Формирование текста сообщения
-		String textSMS = "Ваша заявка номер "+zayvkaNum + " формирована";
-		// Формирование запроса
-		String query = "user="+this.login+"&password="+this.pass+
-						"&to="+tele+"&text="+textSMS+"&from="+this.name;
-		OutputStreamWriter out =
-						new OutputStreamWriter(conn.getOutputStream(), "UTF-8");
-		out.write(query);	
-		out.flush();
-		out.close();
-		
-		// читаем то, что отдал нам сервер
-		String html = readStreamToString(conn.getInputStream(), "UTF-8");
-		int a = html.indexOf("=");
-		// Идентификатор отправленного сообщения
-		String id  = html.substring(0, a);
-		// Записываем в таблицу лог отправки сообщения
-		try {
-			DbDop.WriteRegSMS(tele, zayvkaNum, Integer.valueOf(id));
-		} catch (Exception e) {		
-			e.printStackTrace();
-		}
-	}
-	
-	/**
 	 * Функция проверяет статус отправленного сообщения
 	 * @param id - Идентификатор сообщения
 	 * @return   - статус сообщения
@@ -102,7 +64,9 @@ public class SendSMS {
 
 		// 	читаем то, что отдал нам сервер
 		String html = readStreamToString(conn.getInputStream(), "UTF-8");
-		
+		if (html.indexOf("success") > 0) {
+			res = "Доставлено";
+		}
 		return res;
 	}
 	
@@ -117,5 +81,6 @@ public class SendSMS {
 	    }
 	    return b.toString();
 	}
+
 
 }

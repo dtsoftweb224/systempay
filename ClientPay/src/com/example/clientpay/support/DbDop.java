@@ -82,7 +82,7 @@ public class DbDop {
 	}
 	
 	/* Запись информации о регистрации заявки */
-	public static void WriteRegSMS(String tele, String numPay) throws Exception {
+	public static void WriteRegSMS(String tele, String numPay, int id) throws Exception {
 		
 		Connection conn;
 		PreparedStatement pstmt;
@@ -90,8 +90,8 @@ public class DbDop {
 		ResultSet rs = null;
 		
 		String SQL_SMS_WRITE = "INSERT INTO regsms("
-			+ "data, telephone, status, numPay)"
-			+ " VALUES(?, ?, ?, ?)";		
+			+ "data, telephone, status, numPay, id_sms)"
+			+ " VALUES(?, ?, ?, ?, ?)";		
 		
 		conn = getConnection();		
 						
@@ -104,6 +104,7 @@ public class DbDop {
 			pstmt.setString(2, tele);
 			pstmt.setString(3, "Отправка");
 			pstmt.setString(4, numPay);
+			pstmt.setInt(5, id);
 			pstmt.executeUpdate();
 		} catch (SQLException e) {		
 			e.printStackTrace();

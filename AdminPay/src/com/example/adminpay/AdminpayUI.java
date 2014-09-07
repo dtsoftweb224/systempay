@@ -1,5 +1,7 @@
 package com.example.adminpay;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.List;
 
 import com.example.adminpay.classes.BaseRW;
@@ -8,22 +10,26 @@ import com.example.adminpay.classes.Client;
 import com.example.adminpay.classes.DB;
 import com.example.adminpay.classes.RegZayvki;
 import com.example.adminpay.classes.RegZayvkiDB;
+import com.example.adminpay.classes.SMS;
+import com.example.adminpay.support.SendSMS;
 import com.example.adminpay.window.ModalWindowBik;
 import com.example.adminpay.window.ModalWindowClient;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.event.Action;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+
+import de.steinwedel.messagebox.ButtonId;
+import de.steinwedel.messagebox.Icon;
+import de.steinwedel.messagebox.MessageBox;
 
 /**
  * Main UI class
@@ -41,12 +47,14 @@ public class AdminpayUI extends UI {
 	private Table registryTable;
 	private Table bikTable;
 	private Table clientTable;
+	private Table smsTable;
 	
 	private Table current;
 	
 	private BeanItemContainer<RegZayvki> beansZayvkaReg = new BeanItemContainer<RegZayvki>(RegZayvki.class);
 	private BeanItemContainer<Bik> beansBik = new BeanItemContainer<Bik>(Bik.class);
 	private BeanItemContainer<Client> beansClient = new BeanItemContainer<Client>(Client.class);
+	private BeanItemContainer<SMS> beansSMS = new BeanItemContainer<SMS>(SMS.class);
 	
 	private String state;
 	
@@ -72,8 +80,19 @@ public class AdminpayUI extends UI {
 	private String[] tableBikFieldsTitle = new String[] {"БИК", "СВИФТ", 
 			"Наименование банка", "Отображение наличные", "Отображение безналичные"};
 	
+	/* Поля таблицы - Банки БИК */
+	private String[] tableSMSFields = new String[] {"id_sms", "data", 
+			"telephone", "status", "numPay"};
+	/* Заголовки таблицы - Банки БИК */
+	private String[] tableSMSFieldsTitle = new String[] {"Идентифкатор", 
+			"Дата", "Номер телефона", "Статус", "Номер платежа"};
+	
 	private BeanItem<Client> tmpClient = null;
 	private BeanItem<Bik> tmpBik = null;
+	private BeanItem<SMS> tmpSms = null;
+	
+	private final Action ACTION_STATUS = new Action("Проверить статус");
+	private final Action[] ACTIONS_MARKED = new Action[] { ACTION_STATUS};
 	
 	@Override
 	protected void init(VaadinRequest request) {
@@ -111,6 +130,14 @@ public class AdminpayUI extends UI {
 					
 				}
 				
+				if (state.equals("Статусы SMS")) {
+					
+					buildSMSTable();
+					layout.removeComponent(current);
+					layout.addComponent(smsTable);
+					current = smsTable;
+				}
+				
 				if (state.equals("Банки БИК")) {
 					
 					buildBikTable();
@@ -146,6 +173,7 @@ public class AdminpayUI extends UI {
 		
 		// 
 		logs.addItem("Вход", myCommand);
+		logs.addItem("Статусы SMS", myCommand);
 		
 		// 
 		spsr.addItem("Пользователи", myCommand);
@@ -274,5 +302,72 @@ public class AdminpayUI extends UI {
 		});
 	
 	}
+	
+	/* Формирование таблицы клиентов */
+	private void buildSMSTable() {	
+				
+		try {
+			List<SMS> list = BaseRW.getAllRegSMS(DB.getConnection());
+			for (int i = 0; i < list.size(); i++) {				
+				beansSMS.addBean(list.get(i));				
+			}
+		} catch (Exception e) {
+		
+			e.printStackTrace();
+		}
+	
+		smsTable = new Table("", beansSMS);
+		smsTable.setSelectable(true);
+		smsTable.setWidth("100%");
+		smsTable.setHeight("100%");
+	
+		smsTable.setVisibleColumns(tableSMSFields);
+	
+		for (int i = 0; i < tableSMSFields.length; i++) {
+			smsTable.setColumnHeader(tableSMSFields[i], tableSMSFieldsTitle[i]);
+		}
+		
+		smsTable.addItemClickListener(new ItemClickListener() {
+			
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				
+				/* Двойной клик левой кнопкой мыши по записи в таблице
+				 * 
+				 */				
+				if (event.isDoubleClick()) {			
+					
+				} 
+				tmpSms = beansSMS.getItem(event.getItemId());
+			}
+		});
+		
+		smsTable.addActionHandler(new Action.Handler() {			
+			@Override
+			public void handleAction(Action action, Object sender, Object target) {		
+			
+				/* Вызов функции проверки статуса SMS */
+				if (ACTION_STATUS == action) {
+					SendSMS sms = new SendSMS();
+					String id = String.valueOf(tmpSms.getBean().getId_sms());
+					String str = "";
+					try {
+						str = sms.verifyState(id);
+					} catch (MalformedURLException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					MessageBox.showPlain(Icon.INFO, "Проверка статуса", 
+							"Статус сообщения SMS "+str, ButtonId.OK);
+				}				
+			}			
+			@Override
+			public Action[] getActions(Object target, Object sender) {				
+				return ACTIONS_MARKED;							
+			}
+		});
 
+	}
+	
 }
