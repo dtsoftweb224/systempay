@@ -6,8 +6,11 @@ import java.util.List;
 
 import com.example.managerpay.classes.DB;
 import com.example.managerpay.classes.ZayvkaCard;
+import com.example.managerpay.classes.Zayvki;
 import com.example.managerpay.classes.ZayvkiCardDB;
+import com.example.managerpay.classes.ZayvkiDB;
 import com.example.managerpay.window.WindowHistoryClient;
+import com.example.managerpay.window.WindowZayvkaBindObr;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
@@ -64,7 +67,9 @@ public class ManagerpayUI extends UI {
 	private Button btnSearchAdd = null;
 	
 	private BeanItemContainer<ZayvkaCard> beansZayvka = new BeanItemContainer<ZayvkaCard>(ZayvkaCard.class);
-	private BeanItem<ZayvkaCard> tmpZayvka = null;	
+	private BeanItem<Zayvki> tmpZayvka = null;
+	
+	private BeanItemContainer<Zayvki> beansZayvka1 = new BeanItemContainer<Zayvki>(Zayvki.class);
 	
 	private String state;	
 	private List<Integer> masIdZayvki =  new ArrayList<Integer>();
@@ -78,11 +83,22 @@ public class ManagerpayUI extends UI {
 			"ФИО клиента", "Платежная система", "Валюта", "Сумма списания", 
 			"Комиссия", "Сумма зачисления", "Статус", "Mail", "1"};
 	
+	private String[] tableFields1 = new String[] {"numberPay", "wmid", "date", "payOut",
+			"payIn", "valuta", "summaPay", "kommis", "summaCard", "numSchet",
+			"status","mail", "telephone", "fName","lName", "otch", "Action"};
+	/* Названия полей для отображения*/
+	private String[] tableFieldsTitle1 = new String[] {"Номер заявки","Кошелек", "Дата", "Банк",
+			"Платежная система", "Валюта", "Списание","Комиссия", "Зачисление", "Счет",
+			"Статус", "Mail", "Телефон", "Имя", "Фамилия", "Отчество", "1"};
+	
 	private final Action ACTION_GEN_FILE = new Action("Сформировать файл");
 	private final Action ACTION_HISTORY = new Action("История операций");
-	private final Action ACTION_SUCCESSFUL = new Action("Исполнено");
+	private final Action ACTION_SUCCESSFUL = new Action("Выполнено");
+	private final Action ACTION_EX_ARSHIVE = new Action("Извлечь из архива");
 	private final Action[] ACTIONS_MARKED = new Action[] { ACTION_GEN_FILE, 
 											ACTION_HISTORY, ACTION_SUCCESSFUL};
+	/* Архив */
+	private final Action[] ACTIONS_ARSHIVE = new Action[] { ACTION_EX_ARSHIVE};
 	
 	/* Инициализация приложения */
 	@Override
@@ -117,13 +133,11 @@ public class ManagerpayUI extends UI {
 				if (state.equals("На карту")) {		
 					archive = false;
 					updateZayvkiTable(false);
-					//mainLayout.addComponent(zayvkiCardTable);
 				}
 				
 				if (state.equals("Архив")) {
 					archive = true;
 					updateZayvkiTable(false);
-					//mainLayout.addComponent(zayvkiCardTable);
 				}				
 			}
 			
@@ -153,26 +167,26 @@ public class ManagerpayUI extends UI {
 			zayvkiCardTable.removeAllItems();
 		}	
 		
-		ZayvkiCardDB zayvkiCardList = new ZayvkiCardDB(DB.getConnection());
+		ZayvkiDB zayvkiCard = new ZayvkiDB(DB.getConnection());
 		
 		try {			
-			List<ZayvkaCard> list = new ArrayList<ZayvkaCard>(); 
+			List<Zayvki> list = new ArrayList<Zayvki>(); 
 			if (archive) {
-				/* Заявки из архива */
-				list = zayvkiCardList.getArshiveZayvki();
+				/* Заявки из архива */				
+				list = zayvkiCard.getArshiveZayvki();
 			} else {
-				/* Обычные заявки */
-				list = zayvkiCardList.getAllZayvki();
+				/* Обычные заявки */	
+				list = zayvkiCard.getAllZayvki();
 			}			
 			for (int i = 0; i < list.size(); i++) {				
-				beansZayvka.addBean(list.get(i));				
+				beansZayvka1.addBean(list.get(i));				
 			}
 		} catch (Exception e) {
 			
 			e.printStackTrace();
 		}				
 		
-		zayvkiCardTable = new Table("",beansZayvka);
+		zayvkiCardTable = new Table("",beansZayvka1);
 		zayvkiCardTable.setWidth("100%");
 		zayvkiCardTable.setHeight("100%");
 		zayvkiCardTable.setSelectable(true);
@@ -187,9 +201,9 @@ public class ManagerpayUI extends UI {
 		    }
 		});
 		
-		zayvkiCardTable.setVisibleColumns(tableFields);		
-		for (int i = 0; i < tableFields.length; i++) {
-			zayvkiCardTable.setColumnHeader(tableFields[i], tableFieldsTitle[i]);
+		zayvkiCardTable.setVisibleColumns(tableFields1);		
+		for (int i = 0; i < tableFields1.length; i++) {
+			zayvkiCardTable.setColumnHeader(tableFields1[i], tableFieldsTitle1[i]);
     	}	
 		
 		/* Обработка клика по строке таблицы */
@@ -205,15 +219,21 @@ public class ManagerpayUI extends UI {
 					
 					// Очистка списка идентификаторов
 					masIdZayvki.clear();
-					tmpZayvka = beansZayvka.getItem(event.getItemId());
+					tmpZayvka = beansZayvka1.getItem(event.getItemId());
 					// Создание окна редактирования заявки
 					Window win = new WindowZayvkiCard(tmpZayvka);					
 					UI.getCurrent().addWindow(win);
 				} else if (event.getButtonName().equals("left")) {
 					
-					// Созадние списка идентификаторов заявки
-					tmpZayvka = beansZayvka.getItem(event.getItemId());
-					masIdZayvki.add(tmpZayvka.getBean().getId());
+					if (event.isCtrlKey()) {
+						// Созадние списка идентификаторов заявки
+						tmpZayvka = beansZayvka1.getItem(event.getItemId());
+						masIdZayvki.add(tmpZayvka.getBean().getId());
+					} else {
+						masIdZayvki.clear();
+						tmpZayvka = beansZayvka1.getItem(event.getItemId());
+						masIdZayvki.add(tmpZayvka.getBean().getId());
+					}					
 					// Поиск дублируемых значений
 				}
 			
@@ -227,15 +247,21 @@ public class ManagerpayUI extends UI {
 			public void handleAction(Action action, Object sender, Object target) {
 				
 				/* Формирование файлов для банков */
-				if (ACTION_GEN_FILE == action) {					
-					MessageBox.showPlain(Icon.INFO, "Фомрирование файла", 
-									"Номера заявок "+masIdZayvki.toString(), ButtonId.OK);
-					// Изменение статуса заявок на "На рассмотрении"
-					ZayvkiCardDB zayvkiCardList = new ZayvkiCardDB(DB.getConnection());
-					zayvkiCardList.UpdateZayvkaStatus(masIdZayvki, "На рассмотрении");					
-					masIdZayvki.clear();	
-					// Обновление таблицы заявок
-					updateZayvkiTable(false);
+				if (ACTION_GEN_FILE == action) {
+					
+					if (masIdZayvki.size() > 0) {						
+						// Изменение статуса заявок на "На рассмотрении"
+						ZayvkiDB zayvkiCard = new ZayvkiDB(DB.getConnection());
+						zayvkiCard.UpdateZayvkaStatus(masIdZayvki, "На рассмотрении");								
+						MessageBox.showPlain(Icon.INFO, "Фомрирование файла", 
+								"Номера заявок "+masIdZayvki.toString(), ButtonId.OK);
+						masIdZayvki.clear();
+						// Обновление таблицы заявок
+						updateZayvkiTable(false);
+					} else {
+						MessageBox.showPlain(Icon.ERROR, "Изменение статуса", 
+								"Не выбрано ни одной заявки", ButtonId.OK);
+					}
 				}
 				
 				/* Создание окна "История операций" */
@@ -243,19 +269,46 @@ public class ManagerpayUI extends UI {
 					UI.getCurrent().addWindow(new WindowHistoryClient(tmpZayvka.getBean().getMail()));
 				}
 				
-				/* Измнение статуса на "Исполнено" */
-				if (ACTION_SUCCESSFUL == action) {
-					ZayvkiCardDB zayvkiCardList = new ZayvkiCardDB(DB.getConnection());
-					zayvkiCardList.UpdateZayvkaStatus(masIdZayvki, "Исполнено");					
-					masIdZayvki.clear();	
-					// Обновление таблицы заявок
-					updateZayvkiTable(false);
+				/* Измнение статуса на "Выполнено" */
+				if (ACTION_SUCCESSFUL == action) {		
+					
+					if (masIdZayvki.size() > 0) {
+						ZayvkiDB zayvkiCard = new ZayvkiDB(DB.getConnection());
+						zayvkiCard.UpdateZayvkaStatus(masIdZayvki, "Выполнено");
+						masIdZayvki.clear();	
+						// Обновление таблицы заявок
+						updateZayvkiTable(false);
+					} else {
+						MessageBox.showPlain(Icon.ERROR, "Изменение статуса", 
+								"Не выбрано ни одной заявки", ButtonId.OK);
+					}
+				}
+				
+				/* Извлечение заявки из архива - смена статуса на "На рассмотрении" */
+				if (ACTION_EX_ARSHIVE == action) {
+					if (masIdZayvki.size() > 0) {
+						ZayvkiDB zayvkiCard = new ZayvkiDB(DB.getConnection());
+						zayvkiCard.UpdateZayvkaStatus(masIdZayvki, "На рассмотрении");	
+						masIdZayvki.clear();
+						// Обновление таблицы заявок
+						updateZayvkiTable(false);
+						UI.getCurrent().addWindow(new WindowZayvkaBindObr(tmpZayvka.getBean().getNumberPay()));
+					} else {
+						MessageBox.showPlain(Icon.ERROR, "Изменение статуса", 
+								"Не выбрано ни одной заявки", ButtonId.OK);
+					}
 				}
 			}			
 			@Override
 			public Action[] getActions(Object target, Object sender) {
 				
-				return ACTIONS_MARKED;
+				if (archive == false) {
+					return ACTIONS_MARKED;	
+				} else {
+					return ACTIONS_ARSHIVE;	
+				}
+				
+								
 			}
 		});
 	}

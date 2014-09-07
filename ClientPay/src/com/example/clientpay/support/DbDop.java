@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import com.example.clientpay.classes.ZayvkaCard;
+import com.example.clientpay.classes.Zayvki;
 import com.vaadin.ui.ComboBox;
 
 public class DbDop {
@@ -44,7 +45,7 @@ public class DbDop {
 	}
 	
 	/* Запись информации о регистрации заявки */
-	public static void WriteRegZayvka(ZayvkaCard zayvka) throws Exception {
+	public static void WriteRegZayvka(Zayvki zayvka) throws Exception {
 		
 		Connection conn;
 		PreparedStatement pstmt;
@@ -54,35 +55,55 @@ public class DbDop {
 		String SQL_ZAYVKI_WRITE = "INSERT INTO registry_zayvki("
 			+ "id_zayvki, data, summa, payIn, fioClient, payOut, mailCLient)"
 			+ " VALUES(?, ?, ?, ?, ?, ?, ?)";		
-		String SQL_CONUT_ZAYVKI = "SELECT count(*) as con FROM zayvkicard";
-		
-		int id_zayvki = 0;
 		
 		conn = getConnection();
-		// Получение идентификатора заявки
-		try {			
-			st = conn.createStatement();
-			rs = st.executeQuery(SQL_CONUT_ZAYVKI);			
-			if (rs.next() != false) {
-				id_zayvki = rs.getInt("con");				
-			}
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
+		// Формирование ФИО клиента
+		String fioClient = zayvka.getlName().trim() + " " +
+				zayvka.getfName().trim() + " " + zayvka.getOtch().trim();
+						
 		try {	
 			java.util.Date utilDate = new java.util.Date();
 		    java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
 		    
 			pstmt = conn.prepareStatement(SQL_ZAYVKI_WRITE);
-			pstmt.setInt(1, id_zayvki);
+			pstmt.setString(1, zayvka.getNumberPay());
 			pstmt.setDate(2, sqlDate);
 			pstmt.setDouble(3, zayvka.getSummaPay());
 			pstmt.setString(4, zayvka.getPayIn());
-			pstmt.setString(5, zayvka.getFioClient());
+			pstmt.setString(5, fioClient);
 			pstmt.setString(6, zayvka.getPayOut());
 			pstmt.setString(7, zayvka.getMail());
+			pstmt.executeUpdate();
+		} catch (SQLException e) {		
+			e.printStackTrace();
+		} finally {
+			close(conn, st, rs);
+		}
+	}
+	
+	/* Запись информации о регистрации заявки */
+	public static void WriteRegSMS(String tele, String numPay) throws Exception {
+		
+		Connection conn;
+		PreparedStatement pstmt;
+		Statement st = null;
+		ResultSet rs = null;
+		
+		String SQL_SMS_WRITE = "INSERT INTO regsms("
+			+ "data, telephone, status, numPay)"
+			+ " VALUES(?, ?, ?, ?)";		
+		
+		conn = getConnection();		
+						
+		try {	
+			java.util.Date utilDate = new java.util.Date();
+		    java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+		    
+			pstmt = conn.prepareStatement(SQL_SMS_WRITE);
+			pstmt.setDate(1, sqlDate);
+			pstmt.setString(2, tele);
+			pstmt.setString(3, "Отправка");
+			pstmt.setString(4, numPay);
 			pstmt.executeUpdate();
 		} catch (SQLException e) {		
 			e.printStackTrace();
@@ -108,9 +129,9 @@ public class DbDop {
 		 *  выбирается тип фильтрации записей 
 		 */
 		if (type) {
-			SQL_BIK_NAME = SQL_BIK_NAME + "from_beznal=true";
+			SQL_BIK_NAME = SQL_BIK_NAME + "form_beznal=true";
 		} else {
-			SQL_BIK_NAME = SQL_BIK_NAME + "from_nal=true";
+			SQL_BIK_NAME = SQL_BIK_NAME + "form_nal=true";
 		}
 		
 		conn = getConnection();
@@ -127,5 +148,52 @@ public class DbDop {
 		} finally {
 			close(conn, st, rs);
 		}
+	}
+	
+	
+	/**
+	 * Получение номер заявки
+	 * @param type
+	 * @return
+	 * @throws Exception
+	 */
+	public static int GetNumIndexPay(boolean type) throws Exception {
+		
+		int num = 1;
+		String sqlRead = "";
+		String sqlUpdate = "";
+		Connection conn;
+		Statement st = null;
+		ResultSet rs = null;
+		PreparedStatement pstmt;
+		/* type - true вывод на карту */
+		if (type) {
+			sqlRead = "SELECT numC FROM numId WHERE id=1";
+			sqlUpdate = "UPDATE numId SET numC=? WHERE id=1";
+		} else {
+			sqlRead = "SELECT numB FROM numId WHERE id=1";
+			sqlUpdate = "UPDATE numId SET numB=? WHERE id=1";
+		}
+		
+		conn = getConnection();
+		// Получение идентификатора заявки
+		try {			
+			st = conn.createStatement();
+			rs = st.executeQuery(sqlRead);			
+			if (rs.next() != false) {
+				num = rs.getInt("numC");
+			}
+			// Инкрементирование заявки
+			pstmt = conn.prepareStatement(sqlUpdate);
+			pstmt.setInt(1, num+1);
+			pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(conn, st, rs);
+		}
+		
+		return num;
 	}
 }

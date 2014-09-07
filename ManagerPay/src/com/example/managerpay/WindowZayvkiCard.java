@@ -2,7 +2,9 @@ package com.example.managerpay;
 
 import com.example.managerpay.classes.DB;
 import com.example.managerpay.classes.ZayvkaCard;
+import com.example.managerpay.classes.Zayvki;
 import com.example.managerpay.classes.ZayvkiCardDB;
+import com.example.managerpay.classes.ZayvkiDB;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.BeanItem;
@@ -24,7 +26,7 @@ public class WindowZayvkiCard extends Window
 	private FormLayout mainForm = null;
 	private GridLayout gridLayout = null;
 	
-	BeanFieldGroup<ZayvkaCard> binder = new BeanFieldGroup<ZayvkaCard>(ZayvkaCard.class);
+	BeanFieldGroup<Zayvki> binder = new BeanFieldGroup<Zayvki>(Zayvki.class);
 	
 	private String[] formFields = new String[] {"id", "wmid", "date", "payOut",
 			"fioClient", "payIn", "valuta", "summaPay", "kommis", "summaCard", "status"};
@@ -33,7 +35,15 @@ public class WindowZayvkiCard extends Window
 			"ФИО клиента", "Платежная система", "Валюта", "Сумма списания", 
 			"Комиссия", "Сумма зачисления", "Статус"};
 	
-	public WindowZayvkiCard(BeanItem<ZayvkaCard> tmpZayvka) {
+	private String[] formFields1 = new String[] {"numberPay", "wmid", "date", "payOut",
+			"payIn", "valuta", "summaPay", "kommis", "summaCard", "numSchet",
+			"status","mail", "telephone", "fName","lName", "otch"};
+	/* Названия полей для отображения*/
+	private String[] formFieldsTitle1 = new String[] {"Номер заявки","Кошелек", "Дата", "Банк",
+			"Платежная система", "Валюта", "Сумма списания","Комиссия", "Сумма зачисления", "Счет",
+			"Статус", "Mail", "Телефон", "Имя", "Фамилия", "Отчество"};
+	
+	public WindowZayvkiCard(BeanItem<Zayvki> tmpZayvka) {
 		
 		//mainWindow = main;
 		super("Редактирование заявки");	
@@ -48,17 +58,25 @@ public class WindowZayvkiCard extends Window
 		mainForm.setVisible(true);
 		
 		if (tmpZayvka == null) {
-			ZayvkaCard bean = new ZayvkaCard();			
+			Zayvki bean = new Zayvki();	
 			binder.setItemDataSource(bean);
 		} else {
 			binder.setItemDataSource(tmpZayvka);
 		}		
 		
-		for (int i = 0; i < formFields.length; i++)
+		for (int i = 0; i < formFields1.length; i++)
 		{
-			mainForm.addComponent(binder.buildAndBind(formFieldsTitle[i], formFields[i]));
-			binder.getField(formFields[i]).setWidth("220px");
+			mainForm.addComponent(binder.buildAndBind(formFieldsTitle1[i], formFields1[i]));
+			binder.getField(formFields1[i]).setWidth("220px");
 		}
+		// Закрытие полей для редактирования
+		binder.getField("numberPay").setEnabled(false);
+		binder.getField("date").setEnabled(false);
+		binder.getField("payIn").setEnabled(false);
+		binder.getField("summaPay").setEnabled(false);
+		binder.getField("summaCard").setEnabled(false);
+		binder.getField("kommis").setEnabled(false);
+		binder.getField("status").setEnabled(false);
 		
 		buildButtonForm();
 		setContent(mainForm);
@@ -86,12 +104,13 @@ public class WindowZayvkiCard extends Window
 				} catch (CommitException e1) {					
 					e1.printStackTrace();
 				}
-				BeanItem<ZayvkaCard> item = binder.getItemDataSource();
-				ZayvkaCard zayvkaCard = item.getBean();
-				
+				BeanItem<Zayvki> item = binder.getItemDataSource();
+				Zayvki zayvkaCard = item.getBean();
 				try {
-					ZayvkiCardDB zayvkaDB = new ZayvkiCardDB(DB.getConnection());
-					zayvkaDB.UpdateZayvkaDB(zayvkaCard);
+					/* Редактирование заявки в базе данных */
+					ZayvkiDB zayvkaDB = new ZayvkiDB(DB.getConnection());
+					zayvkaDB.UpdateZayvka(zayvkaCard);
+					// Закрытие окна редактирования
 					close();
 				} catch (Exception e) {					
 					e.printStackTrace();

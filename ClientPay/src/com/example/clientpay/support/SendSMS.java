@@ -71,7 +71,11 @@ public class SendSMS {
 		// Идентификатор отправленного сообщения
 		String id  = html.substring(0, a - 1);
 		// Записываем в таблицу лог отправки сообщения
-		
+		try {
+			DbDop.WriteRegSMS(tele, zayvkaNum);
+		} catch (Exception e) {		
+			e.printStackTrace();
+		}
 	}
 	
 	/**

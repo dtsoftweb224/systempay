@@ -11,7 +11,7 @@ public class RegZayvki {
 	/**
 	 * Идентификатор заявки
 	 */
-	private int id_zayvki;
+	private String id_zayvki;
 	/**
 	 * Дата регистрации заявки
 	 */
@@ -45,11 +45,11 @@ public class RegZayvki {
 		this.id = id;
 	}
 	
-	public int getId_zayvki() {
+	public String getId_zayvki() {
 		return id_zayvki;
 	}
 	
-	public void setId_zayvki(int id_zayvki) {
+	public void setId_zayvki(String id_zayvki) {
 		this.id_zayvki = id_zayvki;
 	}
 	

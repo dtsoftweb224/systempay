@@ -1,13 +1,18 @@
 package com.example.clientpay;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.example.clientpay.classes.DB;
 import com.example.clientpay.classes.RegZayvki;
 import com.example.clientpay.classes.RegZayvkiDB;
 import com.example.clientpay.classes.ZayvkaCard;
+import com.example.clientpay.classes.Zayvki;
 import com.example.clientpay.classes.ZayvkiCardDB;
+import com.example.clientpay.classes.ZayvkiDB;
 import com.example.clientpay.support.DbDop;
+import com.example.clientpay.support.SendMail;
 import com.example.clientpay.support.SendSMS;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -34,8 +39,8 @@ import de.steinwedel.messagebox.MessageBox;
 public class ClientpayUI extends UI {
 	
 	private Form mainForm = null;
-	private ZayvkaCard zayvkiCard = new ZayvkaCard();
-	private BeanItem<ZayvkaCard> beans = null;
+	private Zayvki zayvkiCard = new Zayvki();
+	private BeanItem<Zayvki> beans = null;
 	
 	private Button OK;
 	private Button cancel;
@@ -43,7 +48,8 @@ public class ClientpayUI extends UI {
 	private TextField serial;  // Серия паспорта 
 	private TextField number;  // Номер паспорта
 	private TextField address; // Адрес регистрации
-	private ComboBox paySystem; 
+	private ComboBox paySystem;
+	private ComboBox banki;
 	private VerticalLayout identLayout;
 	
 	private String[] formFields = new String[] {"wmid", "date", "payOut",
@@ -53,6 +59,14 @@ public class ClientpayUI extends UI {
 	private String[] formFieldsTitle = new String[] {"Кошелек", "Дата", "Банк",
 			"ФИО клиента", "Валюта", "Сумма списания", 
 			"Комиссия", "Сумма зачисления", "Эл. почта"};
+	
+	private String[] formFields1 = new String[] {"date", "payIn", "wmid",
+			"valuta","mail", "telephone", "lName", "fName", "otch", "summaPay", 
+			"kommis", "summaCard", "numSchet", "status"};
+	/* Названия полей для отображения*/
+	private String[] formFieldsTitle1 = new String[] {"Дата", "Платежная система", "Кошелек", 
+			"Валюта", "Mail", "Телефон", "Фамилия", "Имя", "Отчество", 
+			"Списание", "Комиссия", "Зачисление", "Счет", "Статус"};
 
 	@Override
 	protected void init(VaadinRequest request) {
@@ -70,6 +84,7 @@ public class ClientpayUI extends UI {
 	    mainForm.setVisible(true);	
 	    	
 	    buildTypeBox();
+	    buildBankiBox();
 	    paySystem = new ComboBox("Платежная система");
 	    paySystem.addItem("WebMoney");
 	    paySystem.addItem("Яндекс");
@@ -77,22 +92,27 @@ public class ClientpayUI extends UI {
 	    paySystem.setValue("WebMoney");
 	    mainForm.getLayout().addComponent(paySystem);
 	    	
-	    beans = new BeanItem<ZayvkaCard>(zayvkiCard);
+	    zayvkiCard.setDate(new Date());
+	    beans = new BeanItem<Zayvki>(zayvkiCard);
 		mainForm.setItemDataSource(beans); 
 		/* Поля видимые на форме */
-		 mainForm.setVisibleItemProperties(formFields);
-		 for (int i = 0; i < formFields.length; i++) {
+		 mainForm.setVisibleItemProperties(formFields1);
+		 for (int i = 0; i < formFields1.length; i++) {
 				 
 			 /* Названия полей */
-			 mainForm.getField(formFields[i]).setCaption(formFieldsTitle[i]);
+			 mainForm.getField(formFields1[i]).setCaption(formFieldsTitle1[i]);
 			 /* Установка ширины поля */
-			 mainForm.getField(formFields[i]).setWidth("220px");
+			 mainForm.getField(formFields1[i]).setWidth("220px");
 		 }
 		 // Временное заполнение полей формы
 		 mainForm.getField("mail").setValue("prizrak309@mail.ru");
-		 mainForm.getField("payOut").setValue("Сбербанк");
-		 mainForm.getField("fioClient").setValue("Иванов Иван Иванович");
-		 mainForm.getField("valuta").setValue("USD");
+		 //mainForm.getField("payOut").setValue("Сбербанк");
+		 mainForm.getField("payIn").setValue("WebMoney");
+		 mainForm.getField("fName").setValue("Иван");	
+		 mainForm.getField("lName").setValue("Иванов");	
+		 mainForm.getField("otch").setValue("Иванович");
+		 mainForm.getField("telephone").setValue("");	
+		 mainForm.getField("valuta").setValue("RUR");
 		 //		 
 		 buildIdentField();
 		 buildButtonForm();
@@ -101,11 +121,12 @@ public class ClientpayUI extends UI {
   private void buildTypeBox() {
 	    	
 	   	type = new ComboBox("Тип оплаты");
-	   	type.addItem("Безналичный");
+	   	type.addItem("На карту");
 	   	type.addItem("Наличный");
 	   	type.setImmediate(true);
-	   	type.setValue("Безналичный");
-	   	type.setWidth("220px");	    
+	   	type.setValue("На карту");
+	   	type.setWidth("220px");	   
+	   	type.setEnabled(false);
 	   	
 	   	type.addValueChangeListener(new ValueChangeListener() {
 			
@@ -117,7 +138,7 @@ public class ClientpayUI extends UI {
 					address.setVisible(true);
 				}
 				
-				if (type.getValue().equals("Безналичный")) {
+				if (type.getValue().equals("На карту")) {
 					serial.setVisible(false);
 					number.setVisible(false);
 					address.setVisible(false);
@@ -168,25 +189,28 @@ public class ClientpayUI extends UI {
 		@Override
 		public void buttonClick(ClickEvent event) {
 			// TODO Auto-generated method stub
+			String numPay = generateNumberPay();
 			try {					
-				BeanItem<ZayvkaCard> item = (BeanItem<ZayvkaCard>) mainForm.getItemDataSource();
+				BeanItem<Zayvki> item = (BeanItem<Zayvki>) mainForm.getItemDataSource();
 				zayvkiCard = item.getBean();
 				zayvkiCard.setStatus("Принято");
+				zayvkiCard.setType(type.getValue().toString());
 				zayvkiCard.setPayIn(paySystem.getValue().toString());
-				ZayvkiCardDB zayvkiCardDB = new ZayvkiCardDB(DB.getConnection());
-				// Запись с БД
-				zayvkiCardDB.WriteZayvka(zayvkiCard);
+				zayvkiCard.setNumberPay(numPay);
+				zayvkiCard.setPayOut(banki.getValue().toString());
+				ZayvkiDB zayvkiDB = new ZayvkiDB(DB.getConnection());
+				
+				zayvkiDB.WriteZayvka(zayvkiCard);
 				DbDop.WriteRegZayvka(zayvkiCard);
 				// Сообщение о выполнении операции
 				MessageBox.showPlain(Icon.INFO, "Фомрирование заявки", 
 						"Формирование заявки выполнено!", ButtonId.OK);
 				// Информация о зарегистрированной заявке
-				/*RegZayvki regZayvka = new RegZayvki(zayvkiCard);
-				RegZayvkiDB regDb = new RegZayvkiDB(DB.getConnection());
-				regDb.WriteRegZayvka(regZayvka);*/
 				// Отправка SMS
-				SendSMS sms = new SendSMS();
-				sms.sendRegZayvka("79041698744", "12345");
+				/*SendSMS sms = new SendSMS();
+				sms.sendRegZayvka("79041698744", numPay);*/
+				// Отправка уведомления на e-mail
+				SendMail sendMail = new SendMail(zayvkiCard.getMail(), numPay);
 				// Очистка данных
 				clearFieldsForm();				
 			} catch (Exception e) {					
@@ -206,22 +230,60 @@ public class ClientpayUI extends UI {
    }
  
   /* Очистка полей формы */
-@SuppressWarnings({ "unchecked", "deprecation" })
-private void clearFieldsForm() {
+ @SuppressWarnings({ "unchecked", "deprecation" })
+ private void clearFieldsForm() {
 
- 	 mainForm.getField("payOut").setValue("");
- 	 mainForm.getField("fioClient").setValue("");
+ 	 mainForm.getField("fName").setValue("");	
+	 mainForm.getField("lName").setValue("");	
+	 mainForm.getField("otch").setValue("");
  	 mainForm.getField("payIn").setValue("");
  	 mainForm.getField("valuta").setValue("");
  	 mainForm.getField("wmid").setValue("");
- 	 mainForm.getField("summaPay").setValue("");
- 	 mainForm.getField("kommis").setValue("");
- 	 mainForm.getField("summaCard").setValue("");
  	 mainForm.getField("date").setValue(new Date());
+ 	 banki.setValue("");
  	 //Поля для наличного расчета
  	 serial.setValue("");
  	 number.setValue("");
  	 address.setValue("");
   }
+ 
+ private void buildBankiBox() {
+	
+	 banki = new ComboBox("Банк");
+	 banki.setImmediate(true);
+	 banki.setValue("На карту");
+	 banki.setWidth("220px");
+	 
+	 try {
+		DbDop.GetBikLoadCombo(banki, true);
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+	 
+	 mainForm.getLayout().addComponent(banki);
+ }
+
+   /* Функция генерации номера платежа */
+	private String generateNumberPay() {
+		
+		String numPay = "";
+		int num = 1;
+		
+		Date now = new Date();
+		DateFormat df = new SimpleDateFormat("MMddyy");
+		numPay = df.format(now);
+		
+		if (type.getValue().equals("На карту")) {
+			numPay = numPay + "C";
+			try {
+				num = DbDop.GetNumIndexPay(true);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			numPay = numPay + String.valueOf(num);
+		}
+		
+		return numPay;
+	}
 
 }
