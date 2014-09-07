@@ -8,6 +8,7 @@ import com.example.adminpay.classes.Client;
 import com.example.adminpay.classes.DB;
 import com.example.adminpay.classes.RegZayvki;
 import com.example.adminpay.classes.RegZayvkiDB;
+import com.example.adminpay.window.ModalWindowBik;
 import com.example.adminpay.window.ModalWindowClient;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
@@ -72,6 +73,7 @@ public class AdminpayUI extends UI {
 			"Наименование банка", "Отображение наличные", "Отображение безналичные"};
 	
 	private BeanItem<Client> tmpClient = null;
+	private BeanItem<Bik> tmpBik = null;
 	
 	@Override
 	protected void init(VaadinRequest request) {
@@ -208,6 +210,24 @@ public class AdminpayUI extends UI {
 		for (int i = 0; i < tableBikFields.length; i++) {
 			bikTable.setColumnHeader(tableBikFields[i], tableBikFieldsTitle[i]);
 		}	
+		
+		bikTable.addItemClickListener(new ItemClickListener() {
+			
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				
+				/* Двойной клик левой кнопкой мыши по записи в таблице
+				 * Происходит открытие формы редактирования заявки 
+				 */				
+				if (event.isDoubleClick()) {
+					
+					tmpBik = beansBik.getItem(event.getItemId());
+					// Создание окна редактирования заявки
+					Window win = new ModalWindowBik(tmpBik);					
+					UI.getCurrent().addWindow(win);
+				} 			
+			}
+		});
 	
 	}
 	
