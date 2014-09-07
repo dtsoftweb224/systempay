@@ -1,15 +1,14 @@
 package com.example.clientpay.support;
 
 import java.sql.Connection;
-import java.util.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import com.example.clientpay.classes.RegZayvki;
 import com.example.clientpay.classes.ZayvkaCard;
+import com.vaadin.ui.ComboBox;
 
 public class DbDop {
 	
@@ -44,6 +43,7 @@ public class DbDop {
 		}
 	}
 	
+	/* Запись информации о регистрации заявки */
 	public static void WriteRegZayvka(ZayvkaCard zayvka) throws Exception {
 		
 		Connection conn;
@@ -53,8 +53,9 @@ public class DbDop {
 		
 		String SQL_ZAYVKI_WRITE = "INSERT INTO registry_zayvki("
 			+ "id_zayvki, data, summa, payIn, fioClient, payOut, mailCLient)"
-			+ " VALUES(?, ?, ?, ?, ?, ?, ?)";
+			+ " VALUES(?, ?, ?, ?, ?, ?, ?)";		
 		String SQL_CONUT_ZAYVKI = "SELECT count(*) as con FROM zayvkicard";
+		
 		int id_zayvki = 0;
 		
 		conn = getConnection();
@@ -84,6 +85,44 @@ public class DbDop {
 			pstmt.setString(7, zayvka.getMail());
 			pstmt.executeUpdate();
 		} catch (SQLException e) {		
+			e.printStackTrace();
+		} finally {
+			close(conn, st, rs);
+		}
+	}
+	
+	/**
+	 * @param combo - выпадающий список в который будут загружены данные
+	 * @param type  - тип формы, для которой заполняется список
+	 * @throws Exception
+	 */
+	public static void GetBikLoadCombo(ComboBox combo, boolean type) throws Exception {
+		
+		String SQL_BIK_NAME = "SELECT bank FROM bik WHERE ";
+		
+		Connection conn;
+		Statement st = null;
+		ResultSet rs = null;
+		
+		/* В зависимости от формы отображения 
+		 *  выбирается тип фильтрации записей 
+		 */
+		if (type) {
+			SQL_BIK_NAME = SQL_BIK_NAME + "from_beznal=true";
+		} else {
+			SQL_BIK_NAME = SQL_BIK_NAME + "from_nal=true";
+		}
+		
+		conn = getConnection();
+		// Получение идентификатора заявки
+		try {			
+			st = conn.createStatement();
+			rs = st.executeQuery(SQL_BIK_NAME);			
+			while(rs.next() != false) {
+				combo.addItem(rs.getString("bank"));
+			}
+			
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			close(conn, st, rs);

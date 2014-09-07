@@ -8,6 +8,7 @@ import com.example.clientpay.classes.RegZayvkiDB;
 import com.example.clientpay.classes.ZayvkaCard;
 import com.example.clientpay.classes.ZayvkiCardDB;
 import com.example.clientpay.support.DbDop;
+import com.example.clientpay.support.SendSMS;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItem;
@@ -183,6 +184,9 @@ public class ClientpayUI extends UI {
 				/*RegZayvki regZayvka = new RegZayvki(zayvkiCard);
 				RegZayvkiDB regDb = new RegZayvkiDB(DB.getConnection());
 				regDb.WriteRegZayvka(regZayvka);*/
+				// Отправка SMS
+				SendSMS sms = new SendSMS();
+				sms.sendRegZayvka("79041698744", "12345");
 				// Очистка данных
 				clearFieldsForm();				
 			} catch (Exception e) {					
