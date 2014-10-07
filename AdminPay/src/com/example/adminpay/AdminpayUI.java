@@ -3,7 +3,6 @@ package com.example.adminpay;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
-
 import com.example.adminpay.classes.BaseRW;
 import com.example.adminpay.classes.Bik;
 import com.example.adminpay.classes.Client;
@@ -14,6 +13,7 @@ import com.example.adminpay.classes.SMS;
 import com.example.adminpay.support.SendSMS;
 import com.example.adminpay.window.ModalWindowBik;
 import com.example.adminpay.window.ModalWindowClient;
+import com.vaadin.annotations.Theme;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.Action;
@@ -26,7 +26,6 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-
 import de.steinwedel.messagebox.ButtonId;
 import de.steinwedel.messagebox.Icon;
 import de.steinwedel.messagebox.MessageBox;
@@ -34,6 +33,7 @@ import de.steinwedel.messagebox.MessageBox;
 /**
  * Main UI class
  */
+@Theme("admintheme")
 @SuppressWarnings("serial")
 public class AdminpayUI extends UI {
 	

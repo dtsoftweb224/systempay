@@ -28,5 +28,7 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/vaadin-server-7.2.6.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/vaadin-shared-7.2.6.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/vaadin-themes-7.2.6.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/messagebox-2.0.6.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/refresher-1.2.3.7.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

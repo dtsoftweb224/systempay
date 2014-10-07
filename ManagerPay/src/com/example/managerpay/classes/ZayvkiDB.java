@@ -11,7 +11,9 @@ public class ZayvkiDB {
 	
 	private final String SQL_ZAYVKI_ALL = "SELECT * FROM zayvki WHERE status <>'Выполнено'";
 	private final String SQL_ZAYVKI_ARSHIVE = "SELECT * FROM zayvki WHERE status = 'Выполнено'";	
+	
 	private String SQL_ZAYVKI_ID = "SELECT * FROM zayvki WHERE id in ";
+	private String SQL_ZAYVKA_ID = "SELECT * FROM zayvki WHERE id = ";
 	/* Запись заявки на безналичный расчет */
 	private final String SQL_INSERT_CARD = "INSERT INTO zayvki(payOut, date,"
 			+ "kommis, numberPay, status, summaCard, summaPay, payIn,"
@@ -49,7 +51,7 @@ public class ZayvkiDB {
 	 * заявки, идентификаторы которых указаны при формировании файла
 	 * Класс - Zayvki
 	 */
-	public List<Zayvki> getZayvkiID(List<Integer> listId) {
+	public Zayvki getZayvkiID(List<Integer> listId) {
 	    
 		// Преобразование массива идентификаторов в строку
 		String condition = ListIDToString(listId);
@@ -62,6 +64,26 @@ public class ZayvkiDB {
 	     } catch (Exception e) {
 	    	 e.printStackTrace();
 	     }
+	     // Возвращаем первую (единственную) заявку
+	     return result.get(0);
+	}
+	
+	/* Выбирает из таблицы заявок, те
+	 * заявки, идентификаторы которых указаны при формировании файла
+	 * Класс - Zayvki
+	 */
+	public List<Zayvki> getZayvkaID(Integer idZayvka) {
+	    
+		SQL_ZAYVKA_ID = SQL_ZAYVKA_ID + String.valueOf(idZayvka);
+		List<Zayvki> result = new ArrayList<Zayvki>();
+	     try
+	     {
+	       result = conn.createQuery(SQL_ZAYVKA_ID)
+	    		   .executeAndFetch(Zayvki.class);
+	     } catch (Exception e) {
+	    	 e.printStackTrace();
+	     }
+	     
 	     return result;
 	}
 	
@@ -149,7 +171,7 @@ public class ZayvkiDB {
     	}
     }
     
-    /* Обновление статуса заявок 
+    /** Обновление статуса заявок 
      * @param status - новый статус, который присваивается заявке
      * @param listId - список идентификаторов заявок, у которых
      * необходимо изменить статус
@@ -178,6 +200,7 @@ public class ZayvkiDB {
     	}
     }
     
+    /* Преобразование списка ID в строку */
     private String ListIDToString(List<Integer> listId) {
     	
     	String list = "";

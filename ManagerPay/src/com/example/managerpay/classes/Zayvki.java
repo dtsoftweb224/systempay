@@ -1,6 +1,7 @@
 package com.example.managerpay.classes;
 
 import java.util.Date;
+import java.util.HashMap;
 
 public class Zayvki {
 	
@@ -295,6 +296,21 @@ public class Zayvki {
 	
 	public void setpDate(Date pDate) {
 		this.pDate = pDate;
+	}
+	
+	/* Преобразование значений класса в HashMap */
+	public HashMap<String, Object> getHash() {
+		
+		HashMap<String, Object> res = new HashMap<String, Object>();
+		res.put("wmid", wmid);
+		res.put("status", status);
+		res.put("mail", mail);
+		res.put("payOut", payOut);
+		res.put("telephone", telephone);
+		res.put("numSchet", numSchet);
+		res.put("type", type);
+				
+		return res;
 	}
 }
 
