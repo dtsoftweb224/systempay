@@ -16,6 +16,12 @@
   		<param-name>UI</param-name>
   		<param-value>com.example.adminpay.AdminpayUI</param-value>
   	</init-param>
+  	<init-param>
+  		<description>
+  		Application widgetset</description>
+  		<param-name>widgetset</param-name>
+  		<param-value>com.example.adminpay.widgetset.AdminpayWidgetset</param-value>
+  	</init-param>
   </servlet>
   <servlet-mapping>
   	<servlet-name>Adminpay Application</servlet-name>

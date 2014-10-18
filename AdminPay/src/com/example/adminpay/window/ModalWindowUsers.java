@@ -1,6 +1,6 @@
 package com.example.adminpay.window;
 
-import com.example.adminpay.classes.Client;
+import com.example.adminpay.classes.Users;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.BeanItem;
@@ -11,64 +11,55 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 
-public class ModalWindowClient extends Window {
+@SuppressWarnings("serial")
+public class ModalWindowUsers extends Window  {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
 	private FormLayout mainForm = null;
 	private GridLayout gridLayout = null;
 	
-	private BeanFieldGroup<Client> binder = new BeanFieldGroup<Client>(Client.class);
+	private BeanFieldGroup<Users> binder = new BeanFieldGroup<Users>(Users.class);
 	
-	/* Поля формы - Клиенты */
-	private String[] tableClientFields = new String[] {"id", "telephone", 
-			"serial", "number", "fio", "mail", "adress"};
-	/* Заголовки полей формы - Клиенты */
-	private String[] tableClientFieldsTitle = new String[] {"id", "Телефон", 
-			"Серия паспорта", "Номер паспорта",	"ФИО клиента", "Электронная почта",
-			"Адрес регистрации"};
-	
-	public ModalWindowClient(BeanItem<Client> tmpClient) {
+	/* Поля таблицы - Пользователи */
+	private Object[] tableUsersFields = new Object[] {"login", 
+			"fio", "type", "telephone"};
+	/* Заголовки таблицы - Пользователи */
+	private String[] tableUsersFieldsTitle = new String[] {"Логин", "ФИО пользователя", 
+			"Роль", "Телефон"};
+
+	public ModalWindowUsers(BeanItem<Users> tmpUsers) {
 		
-		// Создание окна Редактирования клиенты
-		super("Окно редактирования клиента");
+		super("Окно редактирования пользователя");
 		
 		setPositionX(200);
 		setPositionY(150);
 		
 		setWidth("400px");
-		setHeight("450px");
+		setHeight("300px");
 		setModal(true);	
 		
 		// Создание формы
 		mainForm = new FormLayout();
 		mainForm.setVisible(true);
 		
-		if (tmpClient == null) {
+		if (tmpUsers == null) {
 			
-			Client bean = new Client();			
+			Users bean = new Users();			
 			binder.setItemDataSource(bean);
 		} else {
-			binder.setItemDataSource(tmpClient);
+			binder.setItemDataSource(tmpUsers);
 		}
 		
-		// Настройки формы
-		for (int i = 0; i < tableClientFields.length; i++)
+		for (int i = 0; i < tableUsersFields.length; i++)
 		{
-			mainForm.addComponent(binder.buildAndBind(tableClientFieldsTitle[i], tableClientFields[i]));		
-			binder.getField(tableClientFields[i]).setWidth("250px");		
-			//binder.getField(tableClientFields[i]).setRequired(true);
-			//binder.getField(tableClientFields[i]).setRequiredError("The Field may not be empty.");
+			mainForm.addComponent(binder.buildAndBind(tableUsersFieldsTitle[i], tableUsersFields[i]));		
+			binder.getField(tableUsersFields[i]).setWidth("250px");	
+		
 		}
 		
 		buildButtonForm();
 		setContent(mainForm);
-	}	
+	}
 	
-	@SuppressWarnings("serial")
 	private void buildButtonForm() {
 		
 		gridLayout = new GridLayout(2, 1);
@@ -110,5 +101,4 @@ public class ModalWindowClient extends Window {
         //mainForm.addComponent(ok);
         mainForm.addComponent(gridLayout);
 	}
-
 }

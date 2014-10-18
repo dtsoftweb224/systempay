@@ -1,0 +1,1 @@
+$wnd.com_example_adminpay_widgetset_AdminpayWidgetset.runAsyncCallback2('Q8(1572,1,Tjd);_.vc=function P_b(){dRb((!YQb&&(YQb=new iRb),YQb),this.b.e)};wed(Vh)(2);\n//# sourceURL=com.example.adminpay.widgetset.AdminpayWidgetset-2.js\n')

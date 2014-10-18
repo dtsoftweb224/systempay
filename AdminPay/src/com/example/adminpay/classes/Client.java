@@ -8,15 +8,15 @@ public class Client {
 	private int serial;
 	private int number;
 	private String fio;
-	private String address;
+	private String adress;
 	
-	public Client() {
+	/*public Client() {
 		
 		mail = "";
 		telephone = "";
 		fio = "";
 		address = "";
-	}
+	}*/
 	
 	public int getId() {
 		return id;
@@ -66,11 +66,11 @@ public class Client {
 		this.fio = fio;
 	}
 	
-	public String getAddress() {
-		return address;
+	public String getAdress() {
+		return adress;
 	}
 	
-	public void setAddress(String address) {
-		this.address = address;
+	public void setAdress(String adress) {
+		this.adress = adress;
 	}
 }

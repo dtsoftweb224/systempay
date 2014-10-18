@@ -3,7 +3,6 @@ package com.example.adminpay.classes;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sql2o.Sql2o;
 import org.sql2o.Connection;
 
 public class ClientDB {
@@ -26,6 +25,10 @@ public class ClientDB {
 	    	 e.printStackTrace();
 	     }
 	     return result;
+	}
+	
+	public void updateClient(Client client) {
+		
 	}
 
 }
