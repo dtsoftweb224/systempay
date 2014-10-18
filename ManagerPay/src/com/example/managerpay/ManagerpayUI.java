@@ -66,6 +66,7 @@ public class ManagerpayUI extends UI {
 	private MenuItem zayvki   = null;  // Заявки
 	private MenuItem money   = null;   // Электронные деньги
 	private MenuItem tech  = null;     // Техническая поддержка	
+	private MenuItem search  = null;     // Техническая поддержка
 	
 	private GridLayout setLayout = null;
 	private GridLayout searchLayout = null;
@@ -82,11 +83,12 @@ public class ManagerpayUI extends UI {
 	private Button btnUpdate = null;
 	private Label lbLastId = null;
 	
-	private BeanItemContainer<ZayvkaCard> beansZayvka = new BeanItemContainer<ZayvkaCard>(ZayvkaCard.class);
+	//private BeanItemContainer<ZayvkaCard> beansZayvka = new BeanItemContainer<ZayvkaCard>(ZayvkaCard.class);
 	private BeanItem<Zayvki> tmpZayvka = null;
+	private BeanItem<Handling> tmpHandling = null;
 	Filter filterClientNow = null;
 	
-	private BeanItemContainer<Zayvki> beansZayvka1 = new BeanItemContainer<Zayvki>(Zayvki.class);
+	private BeanItemContainer<Zayvki> beansZayvka = new BeanItemContainer<Zayvki>(Zayvki.class);
 	private BeanItemContainer<Handling> beansHandling = new BeanItemContainer<Handling>(Handling.class);
 	
 	private String state;	
@@ -94,7 +96,7 @@ public class ManagerpayUI extends UI {
 	private boolean archive = false; 
 	private int lastLoadId = 0; // Идентификатор последней загруженной заявки
 	
-	private String[] tableFields = new String[] {"numberPay", "wmid", "date", "payOut",
+	private Object[] tableFields = new Object[] {"numberPay", "wmid", "date", "payOut",
 			"payIn", "valuta", "summaPay", "kommis", "summaCard", "numSchet",
 			"status","mail", "telephone", "fName","lName", "otch", "Action"};
 	/* Названия полей для отображения*/
@@ -102,7 +104,7 @@ public class ManagerpayUI extends UI {
 			"Платежная система", "Валюта", "Списание","Комиссия", "Зачисление", "Счет",
 			"Статус", "Mail", "Телефон", "Имя", "Фамилия", "Отчество", "1"};
 	/* Поля для таблицы обращения */
-	private String[] handlingFields = new String[] {"idZayvki", "idZayvki_rod", 
+	private Object[] handlingFields = new Object[] {"idZayvki", "idZayvki_rod", 
 			"date", "status", "komment", "idClient"};
 	/* Названия полей для отображения*/
 	private String[] handlingFieldsTitle = new String[] {"Номер заявки","Родительская заявка", 
@@ -144,6 +146,9 @@ public class ManagerpayUI extends UI {
 		addExtension(refresher);
 	}
 	
+	/**
+	 * Создание основного слоя приложеняи
+	 */
 	private void buildMainContent() {
 		
 		buildMainMenu();
@@ -196,8 +201,10 @@ public class ManagerpayUI extends UI {
 					// Если панель видна скрываем ее
 					if (searchLayout.isVisible()) {
 						searchLayout.setVisible(false);
+						search.setChecked(false);
 					} else {
 						searchLayout.setVisible(true);
+						search.setChecked(true);
 					}					
 				}
 				
@@ -218,7 +225,7 @@ public class ManagerpayUI extends UI {
 		zayvki.addItem("На карту", myCommand);
 		zayvki.addItem("Обналичивание", myCommand);
 		zayvki.addItem("Архив", myCommand);
-		zayvki.addItem("Поиск", myCommand);
+		search = zayvki.addItem("Поиск", myCommand);
 		
 		// Формирование меню Электронные деньги
 		money.addItem("Яндекс-деньги", myCommand);
@@ -260,7 +267,7 @@ public class ManagerpayUI extends UI {
 				}
 			}	
 			for (int i = 0; i < list.size(); i++) {				
-				beansZayvka1.addBean(list.get(i));				
+				beansZayvka.addBean(list.get(i));				
 			}
 			// Запись id последней добавленной заявки
 			
@@ -270,9 +277,9 @@ public class ManagerpayUI extends UI {
 			e.printStackTrace();
 		}				
 		
-		zayvkiCardTable = new Table("",beansZayvka1);
+		zayvkiCardTable = new Table("",beansZayvka);
 		zayvkiCardTable.setWidth("100%");
-		zayvkiCardTable.setHeight("100%");
+		zayvkiCardTable.setHeight("700px");
 		zayvkiCardTable.setSelectable(true);
 		zayvkiCardTable.setMultiSelect(true);
 		
@@ -303,7 +310,7 @@ public class ManagerpayUI extends UI {
 					
 					// Очистка списка идентификаторов
 					masIdZayvki.clear();
-					tmpZayvka = beansZayvka1.getItem(event.getItemId());
+					tmpZayvka = beansZayvka.getItem(event.getItemId());
 					// Создание окна редактирования заявки
 					Window win = new WindowZayvkiCard(tmpZayvka);					
 					UI.getCurrent().addWindow(win);
@@ -311,11 +318,11 @@ public class ManagerpayUI extends UI {
 					
 					if (event.isCtrlKey()) {
 						// Созадние списка идентификаторов заявки
-						tmpZayvka = beansZayvka1.getItem(event.getItemId());
+						tmpZayvka = beansZayvka.getItem(event.getItemId());
 						masIdZayvki.add(tmpZayvka.getBean().getId());
 					} else {
 						masIdZayvki.clear();
-						tmpZayvka = beansZayvka1.getItem(event.getItemId());
+						tmpZayvka = beansZayvka.getItem(event.getItemId());
 						masIdZayvki.add(tmpZayvka.getBean().getId());
 					}					
 					// Поиск дублируемых значений
@@ -405,7 +412,6 @@ public class ManagerpayUI extends UI {
 		
 		//handlingTable.removeAllItems();
 		
-			
 		HandlingDB hanling = new HandlingDB();
 		
 		try {			
@@ -423,7 +429,7 @@ public class ManagerpayUI extends UI {
 		
 		handlingTable = new Table("",beansHandling);
 		handlingTable.setWidth("100%");
-		handlingTable.setHeight("100%");
+		handlingTable.setHeight("700px");
 		handlingTable.setSelectable(true);
 		handlingTable.setMultiSelect(true);
 		
@@ -431,8 +437,31 @@ public class ManagerpayUI extends UI {
 		for (int i = 0; i < handlingFields.length; i++) {
 			handlingTable.setColumnHeader(handlingFields[i], handlingFieldsTitle[i]);
     	}	
+		
+		/* Обработка клика по строке таблицы */
+		handlingTable.addItemClickListener(new ItemClickListener() {
+			
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				
+				/* Двойной клик левой кнопкой мыши по записи в таблице
+				 * Происходит открытие формы редактирования заявки 
+				 */				
+				if (event.isDoubleClick()) {
+					
+					// Очистка списка идентификаторов					
+					tmpHandling = beansHandling.getItem(event.getItemId());
+					// Создание окна редактирования заявки
+					Window win = new WindowHandlingActive(tmpHandling.getBean());					
+					UI.getCurrent().addWindow(win);
+				} 			
+			}
+		});
 	}	
 	
+	/**
+	 * Формирование панели для фильтрации заявок
+	 */
 	private void buildFilterPanel() {
 		
 		/* Создание сетки */
@@ -559,7 +588,16 @@ public class ManagerpayUI extends UI {
 		
 		/* Создание кнопки Обновить */
 		btnUpdate = new Button("Обновить");
-		setLayout.addComponent(btnUpdate, 4, 0);
+		// Обновление таблицы заявок
+		btnUpdate.addClickListener(new ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				// TODO Auto-generated method stub
+				updateZayvkiTable(false, false);
+			}
+		});
+		setLayout.addComponent(btnUpdate, 4, 0);		
 		// Вывод информации
 		lbLastId = new Label("");
 		setLayout.addComponent(lbLastId, 4, 1);
@@ -572,6 +610,7 @@ public class ManagerpayUI extends UI {
 		beansZayvka.removeAllContainerFilters();
 		String strStatus = (String) (statusBox.getValue() == null ? "" : statusBox.getValue());
 		String strClient = (String) (fioClient.getValue() == null ? "" : fioClient.getValue());
+		String strDate = (String) (data.getValue() == null ? "" : data.getValue());
 		
 		/* Проверяем что поле статус не пустое */
 		if (!strStatus.equals("")) {
@@ -587,6 +626,7 @@ public class ManagerpayUI extends UI {
 					true, false);
 			beansZayvka.addContainerFilter(filterClient);
 		}
+				
 	}
 	
 	/* Функция для установки текущего слоя */

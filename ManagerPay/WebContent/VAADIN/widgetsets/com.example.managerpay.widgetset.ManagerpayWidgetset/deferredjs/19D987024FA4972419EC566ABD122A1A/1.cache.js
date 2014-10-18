@@ -1,0 +1,1 @@
+$wnd.com_example_managerpay_widgetset_ManagerpayWidgetset.runAsyncCallback1('x9(1010,1,Bod);_.Ic=function f_b(){sQb((!nQb&&(nQb=new tQb),nQb),this.b.e)};Gcd(Ti)(1);\n//# sourceURL=com.example.managerpay.widgetset.ManagerpayWidgetset-1.js\n')

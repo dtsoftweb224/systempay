@@ -1,6 +1,9 @@
 package com.example.managerpay.classes;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.sql2o.Connection;
@@ -51,7 +54,7 @@ public class ZayvkiDB {
 	 * заявки, идентификаторы которых указаны при формировании файла
 	 * Класс - Zayvki
 	 */
-	public Zayvki getZayvkiID(List<Integer> listId) {
+	public List<Zayvki> getZayvkiID(List<Integer> listId) {
 	    
 		// Преобразование массива идентификаторов в строку
 		String condition = ListIDToString(listId);
@@ -65,14 +68,30 @@ public class ZayvkiDB {
 	    	 e.printStackTrace();
 	     }
 	     // Возвращаем первую (единственную) заявку
-	     return result.get(0);
+	     return result;
+	}
+	
+	public List<Zayvki> getZayvkiID(Integer idZayvka) {
+	    
+		// Преобразование массива идентификаторов в строку
+		SQL_ZAYVKA_ID = SQL_ZAYVKA_ID + String.valueOf(idZayvka);
+		List<Zayvki> result = new ArrayList<Zayvki>();
+	     try
+	     {
+	       result = conn.createQuery(SQL_ZAYVKI_ID)
+	    		   .executeAndFetch(Zayvki.class);
+	     } catch (Exception e) {
+	    	 e.printStackTrace();
+	     }
+	     // Возвращаем первую (единственную) заявку
+	     return result;
 	}
 	
 	/* Выбирает из таблицы заявок, те
 	 * заявки, идентификаторы которых указаны при формировании файла
 	 * Класс - Zayvki
 	 */
-	public List<Zayvki> getZayvkaID(Integer idZayvka) {
+	public Zayvki getZayvkaID(Integer idZayvka) {
 	    
 		SQL_ZAYVKA_ID = SQL_ZAYVKA_ID + String.valueOf(idZayvka);
 		List<Zayvki> result = new ArrayList<Zayvki>();
@@ -84,7 +103,7 @@ public class ZayvkiDB {
 	    	 e.printStackTrace();
 	     }
 	     
-	     return result;
+	     return result.get(0);
 	}
 	
 	/* Выбирает из таблицы заявок, те
@@ -171,6 +190,35 @@ public class ZayvkiDB {
     	}
     }
     
+    public void InsertNewZayvka(Zayvki zayvka) {
+
+    	String num = generateNumberPay();
+    	
+    	try {
+    	    this.conn.createQuery(SQL_INSERT_CARD)    	        
+    	        .addParameter("out", zayvka.getPayOut())
+    	        .addParameter("data", zayvka.getDate())    	       
+    	        .addParameter("kom", zayvka.getKommis())
+    	        .addParameter("num", num)
+    	        .addParameter("status", zayvka.getStatus())
+    	        .addParameter("sumC", zayvka.getSummaCard())
+    	        .addParameter("sumP", zayvka.getSummaPay())
+    	        .addParameter("in", zayvka.getPayIn())
+    	        .addParameter("val", zayvka.getValuta())
+    	        .addParameter("wmid", zayvka.getWmid())
+    	        .addParameter("mail", zayvka.getMail())
+    	        .addParameter("tele", zayvka.getTelephone())
+    	        .addParameter("schet", zayvka.getNumSchet())
+    	        .addParameter("fName", zayvka.getfName())
+    	        .addParameter("lName", zayvka.getlName())
+    	        .addParameter("otch", zayvka.getOtch())
+    	        .addParameter("type", zayvka.getType())
+    	        .executeUpdate();
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    }
+    
     /** Обновление статуса заявок 
      * @param status - новый статус, который присваивается заявке
      * @param listId - список идентификаторов заявок, у которых
@@ -216,5 +264,28 @@ public class ZayvkiDB {
 		
 		return list;
     }
+    
+    /* Функция генерации номера платежа */
+	private String generateNumberPay() {
+		
+		String numPay = "";
+		int num = 1;
+		
+		Date now = new Date();
+		DateFormat df = new SimpleDateFormat("MMddyy");
+		numPay = df.format(now);
+		
+		//if (type.getValue().equals("На карту")) {
+			numPay = numPay + "C";
+			try {
+				num = DBDop.GetNumIndexPay(true);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			numPay = numPay + String.valueOf(num);
+		//}
+		
+		return numPay;
+	}
 
 }

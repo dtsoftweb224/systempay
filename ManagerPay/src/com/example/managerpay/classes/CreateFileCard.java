@@ -50,7 +50,7 @@ public class CreateFileCard {
 		addPayerInfo();
 		
 		ZayvkiDB zayvki = new ZayvkiDB(DB.getConnection());
-		listZayvki = zayvki.getZayvkaID(idZayvki.get(0));				
+		listZayvki = (List<Zayvki>) zayvki.getZayvkiID(idZayvki.get(0));				
 		addDataZayvka(listZayvki.get(0));
 	}
 	

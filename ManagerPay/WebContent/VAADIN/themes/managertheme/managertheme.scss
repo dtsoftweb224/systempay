@@ -30,7 +30,7 @@
   }
   
   .v-button-caption {
-  	font-size: 12px;
+  	font-size: 14px;
   }
   
   .v-gridlayout-slot {
@@ -52,5 +52,21 @@
   
   .search-grid-btn-hide {  	
   	margin-left: 10px;
-  }				
+  }		
+  
+  .form-handling {
+  	padding-left: 30px;
+  }		
+  
+  .form-label {
+  	margin-top: 10px;
+  }
+  
+  .btn-handl-form {
+  	margin-left: 250px;
+  }	
+  
+  .btn-handl-exit {
+  	margin-left: 30px;
+  }	
 }
