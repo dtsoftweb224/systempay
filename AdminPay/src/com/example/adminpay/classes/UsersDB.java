@@ -10,10 +10,14 @@ public class UsersDB {
 	private final Connection conn;
 	
 	private final String SQL_ALL_USERS = "select * from users";
+	// Запрос для создание нового пользователя
 	private final String SQL_ADD_USERS = "INSERT INTO users("
 						+ "login, password, type, fio, telephone) "
 						+ "VALUES(:login, :pass, :type, :fio, :tele)";
-			
+	// Запрос для обновление пользователя
+	private final String SQL_UPDATE_USERS = "UPDATE users set "
+			+ "login = :login, password = :pass, type = :type, "
+			+ "fio = :fio, telephone = :tele WHERE id = :id";			
 	
 	public UsersDB(Connection con) {
 		this.conn = con;
@@ -50,6 +54,26 @@ public class UsersDB {
 		} catch (Exception e) {
 	    	 e.printStackTrace();
 	     }
+	}
+	
+	/**
+	 * Обновление информации о пользователе
+	 * @param user
+	 */
+	public void updateUser(Users user) {
+		
+		try {
+    	    this.conn.createQuery(SQL_UPDATE_USERS)
+    	        .addParameter("id", user.getId())
+    	        .addParameter("login", user.getLogin())
+    	        .addParameter("pass", user.getPassword())    	      
+    	        .addParameter("type", user.getType())
+    	        .addParameter("fio", user.getFio())
+    	        .addParameter("tele", user.getTelephone())  
+    	        .executeUpdate();
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
 	}
 
 }

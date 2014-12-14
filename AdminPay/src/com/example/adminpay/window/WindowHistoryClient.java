@@ -1,8 +1,10 @@
 package com.example.adminpay.window;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 
 
 
@@ -67,7 +69,13 @@ public class WindowHistoryClient extends Window {
 	/* Формирование таблицы историй операций */
 	private void buildTableHistory() {
 		
-		ZayvkiDB zayvkiDB = new ZayvkiDB(DB.getConnection());
+		ZayvkiDB zayvkiDB = null;
+		try {
+			zayvkiDB = new ZayvkiDB(DB.getConnection());
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		try {
 			List<Zayvki> list = new ArrayList<Zayvki>(); 

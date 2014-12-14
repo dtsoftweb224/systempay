@@ -36,7 +36,32 @@ public class RegZayvki {
 	 * Адрес электронной почты клиента
 	 */
 	private String mailClient;
+	/**
+	 * Статус заявки
+	 */
+	private String status;
+	/**
+	 * IP адрес клиента
+	 */
+	private String ip_adress;
 	
+	
+	public String getIp_adress() {
+		return ip_adress;
+	}
+
+	public void setIp_adress(String ip_adress) {
+		this.ip_adress = ip_adress;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
 	public int getId() {
 		return id;
 	}

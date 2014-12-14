@@ -8,7 +8,16 @@ public class Kommis {
 	private double kommis;
 	private int minKommis;
 	private int maxKommis;
+	private String type_pay;
 	
+	public String getType_pay() {
+		return type_pay;
+	}
+
+	public void setType_pay(String type_pay) {
+		this.type_pay = type_pay;
+	}
+
 	public int getId() {
 		return id;
 	}

@@ -13,6 +13,9 @@ public class KommisDB {
 	private final String SQL_ADD_KOMMIS = "INSERT INTO kommis("
 						+ "paySystem, komSystem, kommis, minKommis,"
 						+ "maxKommis) VALUES(:pay, :komSys, :kom, :min, :max)";
+	private final String SQL_UPDATE_KOMMIS = "UPDATE kommis "
+			+ "SET paySystem=:system, komSystem=:komSys, kommis=:kommis, "
+			+ "minKommis=:min, maxKommis=:max where id=:id";
 	
 	public KommisDB(Connection con) {
 		this.conn = con;

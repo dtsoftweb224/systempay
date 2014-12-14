@@ -1,6 +1,12 @@
 package com.example.adminpay.window;
 
+import java.sql.SQLException;
+
+import com.example.adminpay.classes.BaseRW;
 import com.example.adminpay.classes.Bik;
+import com.example.adminpay.classes.Bik_old;
+import com.example.adminpay.classes.DB;
+import com.example.adminpay.classes.Users;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.BeanItem;
@@ -18,15 +24,18 @@ public class ModalWindowBik extends Window {
 	private GridLayout gridLayout = null;
 	private ComboBox comboNal = null;
 	private ComboBox comboBezNal = null;
+	private Bik bean = null;
 	
 	private BeanFieldGroup<Bik> binder = new BeanFieldGroup<Bik>(Bik.class);
 	
 	/* Поля таблицы - Банки БИК */
-	private String[] tableBikFields = new String[] {"bik", "swift", 
-			"bank"};
+	private Object[] tableBikFields = new Object[] {"bik",  
+			"ks", "name", "ind", "tranzit", "city", "address", "phone",
+			"okato", "okpo"};
 	/* Заголовки таблицы - Банки БИК */
-	private String[] tableBikFieldsTitle = new String[] {"БИК", "СВИФТ", 
-			"Наименование банка"};
+	private String[] tableBikFieldsTitle = new String[] {"БИК",  
+			"Корр. счет", "Название", "Индекс", "Транзитный счет", 
+			"Город", "Адрес", "Телефон", "ОКАТО", "ОКПО"};
 	
 	public ModalWindowBik(BeanItem<Bik> tmpBik) {
 
@@ -36,7 +45,7 @@ public class ModalWindowBik extends Window {
 		setPositionY(150);
 		
 		setWidth("45%");
-		setHeight("35%");
+		setHeight("52%");
 		setModal(true);	
 		
 		// Создание формы
@@ -50,15 +59,10 @@ public class ModalWindowBik extends Window {
 			Bik bean = new Bik();			
 			binder.setItemDataSource(bean);			
 		} else {
+			
 			binder.setItemDataSource(tmpBik);
-			
-			if (tmpBik.getBean().isForm_beznal()) {
-				comboBezNal.setValue("Отображать");
-			}
-			
-			if (tmpBik.getBean().isForm_nal()) {
-				comboNal.setValue("Отображать");
-			}
+			//comboBezNal.setValue(tmpBik.getBean().getNal());
+			//comboNal.setValue(tmpBik.getBean().getBeznal());			
 		}
 		
 		for (int i = 0; i < tableBikFields.length; i++)
@@ -67,8 +71,8 @@ public class ModalWindowBik extends Window {
 			binder.getField(tableBikFields[i]).setWidth("250px");		
 		}
 		
-		mainForm.addComponent(comboNal);
-		mainForm.addComponent(comboBezNal);
+		//mainForm.addComponent(comboNal);
+		//mainForm.addComponent(comboBezNal);
 		buildButtonForm();
 		setContent(mainForm);
 	}
@@ -79,15 +83,15 @@ public class ModalWindowBik extends Window {
 	private void buldSettingFields() {
 		
 		comboNal = new ComboBox("Форма наличный расчет");
-		comboNal.addItem("Отображать");
-		comboNal.addItem("Не отображать");
-		comboNal.setValue("Не отображать");
+		comboNal.addItem("Отображается");
+		comboNal.addItem("Не отображается");
+		comboNal.setValue("Не отображается");
 		//mainForm.addComponent(comboNal);
 		
 		comboBezNal = new ComboBox("Форма безналичный расчет");
-		comboBezNal.addItem("Отображать");
-		comboBezNal.addItem("Не отображать");
-		comboBezNal.setValue("Не отображать");
+		comboBezNal.addItem("Отображается");
+		comboBezNal.addItem("Не отображается");
+		comboBezNal.setValue("Не отображается");
 		//mainForm.addComponent(comboBezNal);
 	}
 	
@@ -98,7 +102,7 @@ public class ModalWindowBik extends Window {
 		gridLayout = new GridLayout(2, 1);
 		gridLayout.setWidth("100%");	
 		
-		Button ok = new Button("Сохраненить");
+		Button ok = new Button("Сохранить");
 		Button cancel = new Button("Отмена");
 		
 		gridLayout.addComponent(cancel, 0, 0);
@@ -109,22 +113,20 @@ public class ModalWindowBik extends Window {
 			@Override
 			public void buttonClick(ClickEvent event) {
 			
-				try {
-					binder.commit();
-				} catch (CommitException e1) {					
-					e1.printStackTrace();
-				}
-				//BeanItem<ZayvkaCard> item = binder.getItemDataSource();
-				//ZayvkaCard zayvkaCard = item.getBean();
-				
-				try {
-					//ZayvkiCardDB zayvkaDB = new ZayvkiCardDB(DB.getConnection());
-					//zayvkaDB.UpdateZayvkaDB(zayvkaCard);
+				try {					
+					/*binder.commit();
+					
+					BeanItem<Bik> item = binder.getItemDataSource();
+					bean = item.getBean();
+					//bean.setBeznal(comboBezNal.getValue().toString());
+					//bean.setNal(comboNal.getValue().toString());
+					binder.setItemDataSource(bean);					
 					close();
-				} catch (Exception e) {					
-					e.printStackTrace();
-				}
-				
+					//BaseRW.updateBik(DB.getConnection(), bean);	*/				
+					
+				} catch (Exception e1) {					
+					e1.printStackTrace();
+				}						
 			}
         });
 		

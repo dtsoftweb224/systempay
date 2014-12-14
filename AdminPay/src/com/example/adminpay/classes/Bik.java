@@ -1,51 +1,134 @@
 package com.example.adminpay.classes;
+import java.util.Date;
+
 
 public class Bik {
 	
-	private int bik;
-	private String swift;
-	private String bank;
-	private boolean form_nal;
-	private boolean form_beznal;
+	private int id;
+	private String bik;
+	private String ks;
+	private String name;
+	private String namemini;
+	private String ind;
+	private String city;
+	private String address;
+	private String phone;
+	private String okato;
+	private String okpo;
+	private String regnum;
+	private Date dateadd;
+	private String tranzit;
 	
-	public int getBik() {
+		
+	public String getTranzit() {
+		return tranzit;
+	}
+
+	public void setTranzit(String tranzit) {
+		this.tranzit = tranzit;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getBik() {
 		return bik;
 	}
 	
-	public void setBik(int bik) {
+	public void setBik(String bik) {
 		this.bik = bik;
 	}
 	
-	public String getSwift() {
-		return swift;
+	public String getKs() {
+		return ks;
 	}
 	
-	public void setSwift(String swift) {
-		this.swift = swift;
+	public void setKs(String ks) {
+		this.ks = ks;
 	}
 	
-	public String getBank() {
-		return bank;
+	public String getName() {
+		return name;
 	}
 	
-	public void setBank(String bank) {
-		this.bank = bank;
+	public void setName(String name) {
+		this.name = name;
 	}
 	
-	public boolean isForm_nal() {
-		return form_nal;
+	public String getNamemini() {
+		return namemini;
 	}
 	
-	public void setForm_nal(boolean form_nal) {
-		this.form_nal = form_nal;
+	public void setNamemini(String namemini) {
+		this.namemini = namemini;
+	}	
+	
+	public String getCity() {
+		return city;
 	}
 	
-	public boolean isForm_beznal() {
-		return form_beznal;
+	public void setCity(String city) {
+		this.city = city;
 	}
 	
-	public void setForm_beznal(boolean form_beznal) {
-		this.form_beznal = form_beznal;
+	public String getAddress() {
+		return address;
+	}
+	
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	
+	public String getPhone() {
+		return phone;
+	}
+	
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+	
+	public String getOkato() {
+		return okato;
+	}
+	
+	public void setOkato(String okato) {
+		this.okato = okato;
+	}
+	
+	public String getOkpo() {
+		return okpo;
+	}
+	
+	public void setOkpo(String okpo) {
+		this.okpo = okpo;
+	}
+	
+	public String getRegnum() {
+		return regnum;
+	}
+	
+	public void setRegnum(String regnum) {
+		this.regnum = regnum;
+	}
+	
+	public Date getDateadd() {
+		return dateadd;
+	}
+	
+	public void setDateadd(Date dateadd) {
+		this.dateadd = dateadd;
+	}
+	
+	public String getInd() {
+		return ind;
 	}
 
+	public void setInd(String ind) {
+		this.ind = ind;
+	}
 }
