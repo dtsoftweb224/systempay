@@ -247,6 +247,26 @@ public class BaseRW {
 	}
 	
 	/**
+	 * Удаление пл. системы из БД
+	 * 
+	 * @param conn
+	 * @param pay
+	 */
+	public static void delPaySystem(Connection conn, PaySystem pay) {
+		
+		String sql = "delete from pay_system WHERE id=:id";
+		
+		try {
+			@SuppressWarnings("unused")
+			Connection a = conn.createQuery(sql)
+					.addParameter("id", pay.getId())										
+					.executeUpdate();
+		} catch (Exception e) {
+	    	 e.printStackTrace();
+	     }
+	}
+	
+	/**
 	 * Добавление нового тарифа в БД
 	 * 
 	 * @param conn

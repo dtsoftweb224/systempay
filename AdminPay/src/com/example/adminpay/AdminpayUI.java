@@ -250,6 +250,7 @@ public class AdminpayUI extends UI {
 	private BeanItem<Users> tmpUsers = null;
 	private BeanItem<Kommis> tmpKommis = null;
 	private BeanItem<Rate> tmpRate = null;
+	private BeanItem<PaySystem> tmpPaySystem = null;
 	
 	private final Action ACTION_STATUS = new Action("Проверить статус");
 	private final Action ACTION_ADD_BANK = new Action("Добавить банк");
@@ -613,6 +614,20 @@ public class AdminpayUI extends UI {
 			payTable.setColumnHeader(payFields[i], payFieldsTitle[i]);
     	}
 		
+		payTable.addItemClickListener(new ItemClickListener() {
+			
+			@Override
+			public void itemClick(ItemClickEvent event) {				
+				
+				tmpPaySystem = beansPay.getItem(event.getItemId());
+				
+				if (event.isDoubleClick()) {
+					// Форма редактирования пл. системы
+					tmpPaySystem = beansPay.getItem(event.getItemId());
+				}
+			}
+		});
+		
 		payTable.addActionHandler(new Action.Handler() {
 			
 			@Override
@@ -623,7 +638,18 @@ public class AdminpayUI extends UI {
 						Window win = new ModalWindowPaySystem();					
 						UI.getCurrent().addWindow(win);
 					}
-				}				
+				}
+				
+				if (ACTION_DEL_PAY_SYS == action) {
+					if (tmpPaySystem != null) {
+						// Вызываем функцию удаление пл. системы
+						try {
+							BaseRW.delPaySystem(DB.getConnection(), tmpPaySystem.getBean());
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
+					}
+				}
 			}
 			
 			@Override
@@ -1032,11 +1058,13 @@ public class AdminpayUI extends UI {
 		rateTable.addItemClickListener(new ItemClickListener() {
 			
 			@Override
-			public void itemClick(ItemClickEvent event) {
-				// TODO Auto-generated method stub
-				tmpRate = beansRate.getItem(event.getItemId());
-				Window win = new ModalWindowRate(tmpRate);					
-				UI.getCurrent().addWindow(win);
+			public void itemClick(ItemClickEvent event) {				
+				
+				if (event.isDoubleClick()) {
+					tmpRate = beansRate.getItem(event.getItemId());
+					Window win = new ModalWindowRate(tmpRate);					
+					UI.getCurrent().addWindow(win);
+				}	
 			}
 		});
 		
@@ -1150,10 +1178,7 @@ public class AdminpayUI extends UI {
 			@Override
 			public void buttonClick(ClickEvent event) {
 				
-				beansZayvkaReg.removeAllContainerFilters();
-				Object[] tableRegFields = new Object[] {"id_zayvki", "data", 
-						"summa", "payIn", "payOut", "fioClient", "mailClient", 
-						"status", "ip_adress"};
+				beansZayvkaReg.removeAllContainerFilters();			
 				// Добавление фильтров
 				// Фильтрация по IP адресу
 				String strIpAdress = (String) (ipArress.getValue() == null ? "" : ipArress.getValue());
