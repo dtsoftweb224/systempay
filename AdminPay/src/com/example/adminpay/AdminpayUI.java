@@ -29,6 +29,7 @@ import com.example.adminpay.window.ModalWindowClient;
 import com.example.adminpay.window.ModalWindowClientUr;
 import com.example.adminpay.window.ModalWindowKommis;
 import com.example.adminpay.window.ModalWindowPaySystem;
+import com.example.adminpay.window.ModalWindowPaySystemNew;
 import com.example.adminpay.window.ModalWindowRate;
 import com.example.adminpay.window.ModalWindowUsers;
 import com.example.adminpay.window.WindowHistoryClient;
@@ -161,6 +162,7 @@ public class AdminpayUI extends UI {
 	private String state;
 	private String nameTable = "";
 	private int timeRefresh = 0;
+	private boolean stateUpdate = false;
 	
 	/* Поля таблицы - Регистрация заявок */
 	private Object[] tableRegFields = new Object[] {"id_zayvki", "data", 
@@ -278,9 +280,10 @@ public class AdminpayUI extends UI {
             public void poll(UIEvents.PollEvent event) {
             	// Автоматическое обновление таблиц через 18 секунд
             	timeRefresh ++;
-            	if (timeRefresh > 4) {
+            	if (timeRefresh > 6 || (stateUpdate == true)) {
             		
             		timeRefresh = 0;
+            		stateUpdate = false;
             		switchTable(nameTable);
             	} 
             }
@@ -465,6 +468,7 @@ public class AdminpayUI extends UI {
 		/*if (zayvkiLayout == null) {
 			zayvkiLayout = new VerticalLayout();
 		}*/
+		double sum_itog = 0.0;
 		beansZayvkaReg.removeAllItems();
 		
 		buildFilterPanel();
@@ -479,7 +483,8 @@ public class AdminpayUI extends UI {
 		try {
 			List<RegZayvki> list = regDB.getAllZayvki();
 			for (int i = 0; i < list.size(); i++) {				
-				beansZayvkaReg.addBean(list.get(i));				
+				beansZayvkaReg.addBean(list.get(i));
+				sum_itog = sum_itog + list.get(i).getSumma();
 			}
 		} catch (Exception e) {
 		
@@ -490,17 +495,17 @@ public class AdminpayUI extends UI {
 		registryTable.setSelectable(true);
 		registryTable.setWidth("100%");
 		registryTable.setHeight("500px");
+		registryTable.setFooterVisible(true);
 	
 		registryTable.setVisibleColumns(tableRegFields);
 	
 		for (int i = 0; i < tableRegFields.length; i++) {
 			registryTable.setColumnHeader(tableRegFields[i], tableRegFieldsTitle[i]);
 		}
-	
-		//zayvkiLayout.addComponent(registryTable);
 		
-		//layout.addComponent(zayvkiLayout);
-		//tableLayout.addComponent(registryTable);
+		registryTable.setColumnFooter("id_zayvki", "Итого");
+		registryTable.setColumnFooter("summa", String.valueOf(sum_itog));
+		
 		newTable = registryTable;
 		nameTable = "registryTable";
 	}
@@ -624,6 +629,11 @@ public class AdminpayUI extends UI {
 				if (event.isDoubleClick()) {
 					// Форма редактирования пл. системы
 					tmpPaySystem = beansPay.getItem(event.getItemId());
+					//PaySystem pay1 = tmpPaySystem.getBean();
+					//Window win = new ModalWindowPaySystem(tmpPaySystem.getBean());
+					Window win = new ModalWindowPaySystemNew(tmpPaySystem.getBean());
+					UI.getCurrent().addWindow(win);
+					
 				}
 			}
 		});
@@ -635,7 +645,8 @@ public class AdminpayUI extends UI {
 				
 				if (ACTION_ADD_PAY_SYS == action) {
 					if (current == payTable) {						
-						Window win = new ModalWindowPaySystem();					
+						//Window win = new ModalWindowPaySystem(null);
+						Window win = new ModalWindowPaySystemNew(null);
 						UI.getCurrent().addWindow(win);
 					}
 				}
@@ -645,6 +656,7 @@ public class AdminpayUI extends UI {
 						// Вызываем функцию удаление пл. системы
 						try {
 							BaseRW.delPaySystem(DB.getConnection(), tmpPaySystem.getBean());
+							stateUpdate = true;
 						} catch (SQLException e) {
 							e.printStackTrace();
 						}
@@ -1537,7 +1549,7 @@ public class AdminpayUI extends UI {
 				buildRegistryTable();
 				tableLayout.addComponent(registryTable);
 				current = registryTable;
-				setPollInterval(3000);
+				setPollInterval(2000);
 			} else {
 				MessageBox.showPlain(Icon.ERROR, "Авторизация", 
 					"Неверно введ логин пользователя или пароль 2", ButtonId.OK);

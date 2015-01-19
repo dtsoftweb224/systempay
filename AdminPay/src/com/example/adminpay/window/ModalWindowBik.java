@@ -30,12 +30,12 @@ public class ModalWindowBik extends Window {
 	
 	/* Поля таблицы - Банки БИК */
 	private Object[] tableBikFields = new Object[] {"bik",  
-			"ks", "name", "ind", "tranzit", "city", "address", "phone",
-			"okato", "okpo"};
+			"ks", "name", "ind", "city", "address", "phone",
+			"okato", "okpo", "tranzit"};
 	/* Заголовки таблицы - Банки БИК */
 	private String[] tableBikFieldsTitle = new String[] {"БИК",  
-			"Корр. счет", "Название", "Индекс", "Транзитный счет", 
-			"Город", "Адрес", "Телефон", "ОКАТО", "ОКПО"};
+			"Корр. счет", "Название", "Индекс", 
+			"Город", "Адрес", "Телефон", "ОКАТО", "ОКПО", "Транзитный счет"};
 	
 	public ModalWindowBik(BeanItem<Bik> tmpBik) {
 
@@ -60,19 +60,17 @@ public class ModalWindowBik extends Window {
 			binder.setItemDataSource(bean);			
 		} else {
 			
-			binder.setItemDataSource(tmpBik);
-			//comboBezNal.setValue(tmpBik.getBean().getNal());
-			//comboNal.setValue(tmpBik.getBean().getBeznal());			
+			binder.setItemDataSource(tmpBik);		
 		}
 		
 		for (int i = 0; i < tableBikFields.length; i++)
 		{
 			mainForm.addComponent(binder.buildAndBind(tableBikFieldsTitle[i], tableBikFields[i]));		
-			binder.getField(tableBikFields[i]).setWidth("250px");		
+			binder.getField(tableBikFields[i]).setWidth("250px");	
+			binder.getField(tableBikFields[i]).setEnabled(false);	
 		}
+		binder.getField(tableBikFields[tableBikFields.length - 1]).setEnabled(true);
 		
-		//mainForm.addComponent(comboNal);
-		//mainForm.addComponent(comboBezNal);
 		buildButtonForm();
 		setContent(mainForm);
 	}

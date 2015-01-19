@@ -247,6 +247,27 @@ public class BaseRW {
 	}
 	
 	/**
+	 * @param conn
+	 * @param pay
+	 */
+	public static void updatePaySystem(Connection conn, PaySystem pay) {
+		
+		String sql = "UPDATE pay_system SET pay=:pay, list_val=:list "
+				+ " WHERE id=:id";
+		
+		try {
+			@SuppressWarnings("unused")
+			Connection a = conn.createQuery(sql)
+					.addParameter("pay", pay.getPay())
+					.addParameter("list", pay.getList_val())
+					.addParameter("id", pay.getId())
+					.executeUpdate();
+		} catch (Exception e) {
+	    	 e.printStackTrace();
+	     }
+	}
+	
+	/**
 	 * Удаление пл. системы из БД
 	 * 
 	 * @param conn
