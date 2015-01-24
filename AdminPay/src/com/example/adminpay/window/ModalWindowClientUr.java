@@ -53,7 +53,7 @@ public class ModalWindowClientUr extends Window {
 		setPositionY(150);
 				
 		setWidth("400px");
-		setHeight("450px");
+		setHeight("400px");
 		setModal(true);
 		
 		mainForm = new FormLayout();

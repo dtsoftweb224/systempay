@@ -1,5 +1,5 @@
 CREATE TABLE client_ur (
-  id int(11) NOT NULL,
+  id int(11) NOT NULL AUTO_INCREMENT,
   ogrn varchar(20) NOT NULL,
   inn varchar(30) NOT NULL,
   kpp varchar(30) NOT NULL,
@@ -7,7 +7,7 @@ CREATE TABLE client_ur (
   mail varchar(255) NOT NULL,
   telephone varchar(12) DEFAULT NULL,
   address varchar(255) DEFAULT NULL,
-  PRIMARY KEY (ogrn)
+  UNIQUE INDEX id (id)
 )
 ENGINE = INNODB
 AVG_ROW_LENGTH = 16384

@@ -29,17 +29,19 @@ import de.steinwedel.messagebox.MessageBox;
 public class ModalWindowPaySystem extends Window {
 	
 	private VerticalLayout mainLayout = null;
-	private FormLayout mainForm = null;
+	//private FormLayout mainForm = null;
 	private GridLayout grid = null;
 	private GridLayout btnLayout = null;
 	private TextField paySystem;
-	private Button addVal;	
+	private Button addVal;
+	private PaySystem payEdit = null;
 	
 	private int countValut = 2;
 	private List<TextField> listFileds = new ArrayList<TextField>();
+	private boolean edit = false; // Режим редактирования
 	
 	@SuppressWarnings("serial")
-	public ModalWindowPaySystem() {
+	public ModalWindowPaySystem(PaySystem tmpPaySystem) {
 		
 		super("Добавление новой пл. системы");
 		
@@ -49,6 +51,12 @@ public class ModalWindowPaySystem extends Window {
 		setWidth("600px");
 		setHeight("300px");
 		setModal(true);	
+		
+		if (tmpPaySystem != null) {
+			payEdit = tmpPaySystem;
+			edit = true;
+			countValut = 2;
+		}
 		
 		// Создание формы
 		//mainForm = new FormLayout();
@@ -66,22 +74,14 @@ public class ModalWindowPaySystem extends Window {
 		grid.setWidth("80%");
 		// Добавление поля пл. система
 		grid.addComponent(new Label("Платежная система"), 0, 0);
-		grid.addComponent(paySystem, 1, 0);		
+		grid.addComponent(paySystem, 1, 0);
 		
-		// Добавление первого поля валюта
-		TextField tmpField = new TextField();
-		tmpField.setWidth("180px");
-		tmpField.addStyleName("valuta-field");
-		// Добавление поля в список полей
-		//listFileds.add(tmpField);
-		grid.addComponent(new Label("Валюта " + String.valueOf(countValut)), 0, 1);
-		grid.addComponent(tmpField, 1, 1);		
 		// Формирование кнопки Добавить
 		addVal = new Button("Добавить");
 		grid.addComponent(addVal, 2, 1);
-		
+				
 		addVal.addClickListener(new ClickListener() {
-			
+					
 			@Override
 			public void buttonClick(ClickEvent event) {
 				// Добавление нового поля для ввода валюты
@@ -92,12 +92,41 @@ public class ModalWindowPaySystem extends Window {
 				//listFileds.add(tmpField);
 				// Размещение созданного поля на форме
 				countValut = countValut + 1;
-				grid.addComponent(new Label("Валюта " + String.valueOf(countValut)), 0, countValut - 1);
+				grid.addComponent(new Label("Валюта " + String.valueOf(countValut - 1)), 0, countValut - 1);
 				grid.addComponent(tmpField, 1, countValut - 1);
 			}
 		});	
 		
-		//grid.setColumnExpandRatio(1, 1);
+		if (edit) {
+			// Заполняем значения
+			paySystem.setValue(payEdit.getPay());
+			// Формирование полей валют
+			String[] valList = payEdit.getList_val().split("/");
+			for (int i = 0; i < valList.length; i++) {
+				
+				TextField tmpFieldEdit = new TextField();
+				tmpFieldEdit.setWidth("180px");
+				tmpFieldEdit.addStyleName("valuta-field");
+				tmpFieldEdit.setValue(valList[i]);
+				// Размещение созданного поля на форме				
+				grid.addComponent(new Label("Валюта " + String.valueOf(countValut - 1)), 0, countValut - 1);
+				grid.addComponent(tmpFieldEdit, 1, countValut - 1);
+				countValut = countValut + 1;				
+			}
+		} else { 	
+		
+			//	Добавление первого поля валюта
+			TextField tmpField = new TextField();
+			tmpField.setWidth("180px");
+			tmpField.addStyleName("valuta-field");
+		
+			// Добавление поля в список полей
+			//listFileds.add(tmpField);
+			grid.addComponent(new Label("Валюта " + String.valueOf(countValut)), 0, 1);
+			grid.addComponent(tmpField, 1, 1);		
+		}	
+		
+		//grid.setColumnExpandRatio(1, 1);		
 		
 		mainLayout.addComponent(grid);
 		buildButtonForm();
@@ -125,9 +154,16 @@ public class ModalWindowPaySystem extends Window {
 					PaySystem pay = new PaySystem();
 					if (!paySystem.getValue().toString().equals("")) {
 						pay.setPay(paySystem.getValue().toString());
-						pay.setList_val(getValField());
-						// Добавление новой платежной системы в БД
-						BaseRW.addPaySystem(DB.getConnection(), pay);
+						pay.setList_val(getValField());						
+						if (edit) {
+							// Редактирование
+							pay.setId(payEdit.getId());
+							BaseRW.updatePaySystem(DB.getConnection(), pay);
+						} else {
+							// Добавление новой платежной системы в БД
+							BaseRW.addPaySystem(DB.getConnection(), pay);
+						}
+						
 					} else {
 						MessageBox.showPlain(Icon.ERROR, "Ошибка ввода", 
 								"Введены не все значения", ButtonId.OK);
