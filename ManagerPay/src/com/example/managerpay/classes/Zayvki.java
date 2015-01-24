@@ -70,17 +70,9 @@ public class Zayvki {
 	 */
 	private String mail;
 	/**
-	 * Имя клиента
+	 * ФИО клиента
 	 */
-	private String fName;
-	/**
-	 * Фамилия клиента
-	 */
-	private String lName;
-	/**
-	 * Отчество клиента
-	 */
-	private String otch;
+	private String fio;	
 	/**
 	 * Дата рождения
 	 */
@@ -110,24 +102,45 @@ public class Zayvki {
 	 */
 	private String telephone;
 	/**
-	 * Тип платежа - На карту, Наличные
+	 * Тип операции - Ввод, Вывод
 	 */
-	private String type;
+	private String typeOper;	
+	/**
+	 * Тип оплаты - Списано, Начислено
+	 */
+	private String typeRaschet;
 	
+		
+	public String getFio() {
+		return fio;
+	}
+
+	public void setFio(String fio) {
+		this.fio = fio;
+	}
+
 	public String getTelephone() {
 		return telephone;
 	}
 
 	public void setTelephone(String telephone) {
 		this.telephone = telephone;
+	}	
+
+	public String getTypeOper() {
+		return typeOper;
 	}
 
-	public String getType() {
-		return type;
+	public void setTypeOper(String typeOper) {
+		this.typeOper = typeOper;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public String getTypeRaschet() {
+		return typeRaschet;
+	}
+
+	public void setTypeRaschet(String typeRaschet) {
+		this.typeRaschet = typeRaschet;
 	}
 
 	public String getNumSchet() {
@@ -234,30 +247,6 @@ public class Zayvki {
 		this.mail = mail;
 	}
 	
-	public String getfName() {
-		return fName;
-	}
-	
-	public void setfName(String fName) {
-		this.fName = fName;
-	}
-	
-	public String getlName() {
-		return lName;
-	}
-	
-	public void setlName(String lName) {
-		this.lName = lName;
-	}
-	
-	public String getOtch() {
-		return otch;
-	}
-	
-	public void setOtch(String otch) {
-		this.otch = otch;
-	}
-	
 	public Date getDate_born() {
 		return date_born;
 	}
@@ -308,7 +297,8 @@ public class Zayvki {
 		res.put("payOut", payOut);
 		res.put("telephone", telephone);
 		res.put("numSchet", numSchet);
-		res.put("type", type);
+		res.put("type", typeOper);
+		res.put("fio", fio);
 				
 		return res;
 	}

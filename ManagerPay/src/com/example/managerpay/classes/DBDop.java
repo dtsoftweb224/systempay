@@ -11,7 +11,8 @@ public class DBDop {
 	
 	private static final String DB_URL = "jdbc:mysql://localhost:3306/pay_system?characterEncoding=UTF-8&amp;characterSetResults=utf8&amp";
 	private static final String DB_USER = "root";
-	private static final String DB_PASS = "root";
+	//private static final String DB_PASS = "root";
+	private static final String DB_PASS = "ghbphfr";
 	
 	/* Соединение с БД */
 	public static Connection getConnection() throws ClassNotFoundException {

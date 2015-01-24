@@ -1,7 +1,7 @@
 CREATE TABLE rate (
   id int(11) NOT NULL AUTO_INCREMENT,  
   operation varchar(10) NOT NULL,
-  type_paschet varchar(20) NOT NULL,
+  type_raschet varchar(20) NOT NULL,
   pay_system varchar(100),
   point varchar(100) NOT NULL,
   val_point varchar(100),

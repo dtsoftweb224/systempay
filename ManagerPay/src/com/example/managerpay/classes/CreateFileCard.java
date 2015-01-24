@@ -114,8 +114,8 @@ public class CreateFileCard {
 		list.add("ПолучательСчет=" + zayvka.getNumSchet());
 		// ИНН получателя
 		String fio = "";
-		fio = zayvka.getlName() + " " + zayvka.getfName() +
-				 " " + zayvka.getOtch();
+		fio = zayvka.getFio();
+		
 		list.add("Получатель=ИНН " + fio);
 		// ФИО получателя
 		list.add("Получатель1=" + fio);		

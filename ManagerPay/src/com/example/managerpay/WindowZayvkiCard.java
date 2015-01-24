@@ -43,7 +43,11 @@ public class WindowZayvkiCard extends Window
 			"Платежная система", "Валюта", "Сумма списания","Комиссия", "Сумма зачисления", "Счет",
 			"Статус", "Mail", "Телефон", "Имя", "Фамилия", "Отчество"};
 	
-	public WindowZayvkiCard(BeanItem<Zayvki> tmpZayvka) {
+	/**
+	 * @param tmpZayvka - бин заявки
+	 * @param arshive   - если true заявка архивная, иначе нормальная
+	 */
+	public WindowZayvkiCard(BeanItem<Zayvki> tmpZayvka, boolean arshive) {
 		
 		//mainWindow = main;
 		super("Редактирование заявки");	
@@ -70,13 +74,16 @@ public class WindowZayvkiCard extends Window
 			binder.getField(formFields1[i]).setWidth("220px");
 		}
 		// Закрытие полей для редактирования
+		binder.getField("wmid").setEnabled(false);
 		binder.getField("numberPay").setEnabled(false);
 		binder.getField("date").setEnabled(false);
 		binder.getField("payIn").setEnabled(false);
 		binder.getField("summaPay").setEnabled(false);
-		binder.getField("summaCard").setEnabled(false);
-		binder.getField("kommis").setEnabled(false);
+		//binder.getField("summaCard").setEnabled(false);
+		//binder.getField("kommis").setEnabled(false);
 		binder.getField("status").setEnabled(false);
+		binder.getField("mail").setEnabled(false);
+		binder.getField("telephone").setEnabled(false);
 		
 		buildButtonForm();
 		setContent(mainForm);

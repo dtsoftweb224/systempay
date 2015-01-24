@@ -12,17 +12,17 @@ public class ZayvkiDB {
 	
 	private final Connection conn;
 	
-	private final String SQL_ZAYVKI_ALL = "SELECT * FROM zayvki WHERE status <>'Выполнено'";
-	private final String SQL_ZAYVKI_ARSHIVE = "SELECT * FROM zayvki WHERE status = 'Выполнено'";	
+	private final String SQL_ZAYVKI_ALL = "SELECT * FROM zayvki";
+	private final String SQL_ZAYVKI_ARSHIVE = "SELECT * FROM arshive";	
 	
 	private String SQL_ZAYVKI_ID = "SELECT * FROM zayvki WHERE id in ";
 	private String SQL_ZAYVKA_ID = "SELECT * FROM zayvki WHERE id = ";
 	/* Запись заявки на безналичный расчет */
 	private final String SQL_INSERT_CARD = "INSERT INTO zayvki(payOut, date,"
 			+ "kommis, numberPay, status, summaCard, summaPay, payIn,"
-			+ "valuta, wmid, mail, telephone, numSchet, fName, lName, otch, type) "
+			+ "valuta, wmid, mail, telephone, numSchet, fio, type) "
 			+ "VALUES(:out, :data, :kom, :num, :status, :sumC, :sumP, :in, "
-			+ ":val, :wmid, :mail, :tele, :schet, :fName, :lName, :otch, :type)";
+			+ ":val, :wmid, :mail, :tele, :schet, :fio, :type)";
 	/* Редактирование заявки на безналичный расчет */
 	private final String SQL_UPDATE_CARD = "UPDATE zayvki SET"
 			+ " payOut = :bank, date = :date, kommis = :kommis, numberPay = :nPay,"
@@ -78,7 +78,7 @@ public class ZayvkiDB {
 		List<Zayvki> result = new ArrayList<Zayvki>();
 	     try
 	     {
-	       result = conn.createQuery(SQL_ZAYVKI_ID)
+	       result = conn.createQuery(SQL_ZAYVKA_ID)
 	    		   .executeAndFetch(Zayvki.class);
 	     } catch (Exception e) {
 	    	 e.printStackTrace();
@@ -125,7 +125,7 @@ public class ZayvkiDB {
 	/* Редактирование заявки в БД */
 	public void UpdateZayvka(Zayvki zayvka) {
 		
-		if (zayvka.getType().equals("На карту")) {
+		if (zayvka.getTypeOper().equals("Ввод")) {
     		UpdateZayvkaCard(zayvka);
     	}
 	}
@@ -157,7 +157,7 @@ public class ZayvkiDB {
 	 /* Добавление новой заявки в базу данных */
     public void WriteZayvka(Zayvki zayvka) {
     	
-    	if (zayvka.getType().equals("На карту")) {
+    	if (zayvka.getTypeOper().equals("Ввод")) {
     		WriteZayvkaCard(zayvka);
     	}    	
     }
@@ -180,10 +180,8 @@ public class ZayvkiDB {
     	        .addParameter("mail", zayvka.getMail())
     	        .addParameter("tele", zayvka.getTelephone())
     	        .addParameter("schet", zayvka.getNumSchet())
-    	        .addParameter("fName", zayvka.getfName())
-    	        .addParameter("lName", zayvka.getlName())
-    	        .addParameter("otch", zayvka.getOtch())
-    	        .addParameter("type", zayvka.getType())
+    	        .addParameter("fio", zayvka.getFio())    	       
+    	        .addParameter("type", zayvka.getTypeOper())
     	        .executeUpdate();
     	} catch (Exception e) {
     		e.printStackTrace();
@@ -209,10 +207,8 @@ public class ZayvkiDB {
     	        .addParameter("mail", zayvka.getMail())
     	        .addParameter("tele", zayvka.getTelephone())
     	        .addParameter("schet", zayvka.getNumSchet())
-    	        .addParameter("fName", zayvka.getfName())
-    	        .addParameter("lName", zayvka.getlName())
-    	        .addParameter("otch", zayvka.getOtch())
-    	        .addParameter("type", zayvka.getType())
+    	        .addParameter("fio", zayvka.getFio())    	        
+    	        .addParameter("type", zayvka.getTypeOper())
     	        .executeUpdate();
     	} catch (Exception e) {
     		e.printStackTrace();
