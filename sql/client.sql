@@ -1,14 +1,16 @@
-CREATE TABLE client (
-  id int(11) NOT NULL,
+CREATE TABLE pay_system.client (
+  id int(11) NOT NULL AUTO_INCREMENT,
   mail varchar(255) NOT NULL,
   telephone varchar(12) DEFAULT NULL,
-  serial decimal(10, 0) NOT NULL,
-  number decimal(10, 0) NOT NULL,
+  serial decimal(10, 0) DEFAULT NULL,
+  number decimal(10, 0) DEFAULT NULL,
   fio varchar(255) NOT NULL,
-  address varchar(255) DEFAULT NULL,
-  PRIMARY KEY (mail)
+  adress varchar(255) DEFAULT NULL,
+  UNIQUE INDEX id (id),
+  UNIQUE INDEX mail (mail)
 )
 ENGINE = INNODB
-AVG_ROW_LENGTH = 16384
+AUTO_INCREMENT = 6
+AVG_ROW_LENGTH = 4096
 CHARACTER SET utf8
 COLLATE utf8_general_ci;

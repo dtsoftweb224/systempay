@@ -1,4 +1,4 @@
-﻿CREATE TABLE pay_system.zayvki (
+CREATE TABLE pay_system.zayvki (
   id int(11) NOT NULL AUTO_INCREMENT,
   wmid varchar(255) NOT NULL,
   date datetime NOT NULL,
@@ -21,10 +21,12 @@
   telephone varchar(11) DEFAULT NULL,
   typeOper varchar(100) NOT NULL,
   typeRaschet varchar(255) NOT NULL,
-  UNIQUE INDEX id (id)
+  UNIQUE INDEX id (id),
+  INDEX mail (mail),
+  UNIQUE INDEX numPay (numberPay)
 )
 ENGINE = INNODB
-AUTO_INCREMENT = 21
+AUTO_INCREMENT = 4
 AVG_ROW_LENGTH = 3276
 CHARACTER SET utf8
 COLLATE utf8_general_ci
